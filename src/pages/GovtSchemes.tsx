@@ -186,7 +186,7 @@ export default function GovtSchemes() {
             <Select 
               value={selectedCategory} 
               onValueChange={(val) => {
-                setSelectedCategory(val);
+                setSelectedCategory(val ?? 'All');
                 setCurrentPage(1);
               }}
             >
@@ -205,7 +205,7 @@ export default function GovtSchemes() {
 
         <button
           onClick={() => navigate('/govt-schemes/new')}
-          className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md shadow-emerald-500/10 transition-colors text-xs font-extrabold flex items-center justify-center gap-1.5"
+          className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md shadow-emerald-500/10 transition-colors text-xs font-extrabold flex items-center justify-center gap-1"
         >
           <Plus size={14} />
           Add Scheme
@@ -230,7 +230,7 @@ export default function GovtSchemes() {
                   
                   {/* ID */}
                   <TableCell className="px-6 py-4 align-middle">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50/50 border border-emerald-500/10 px-2 py-0.5 rounded-lg w-fit font-mono">
+                    <div className="flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50/50 border border-emerald-500/10 px-2 py-0 rounded-lg w-fit font-mono">
                       <span>{s.id}</span>
                     </div>
                   </TableCell>
@@ -242,17 +242,17 @@ export default function GovtSchemes() {
 
                   {/* Category */}
                   <TableCell className="px-6 py-4 align-middle">
-                    <span className="inline-flex items-center bg-neutral-50 text-neutral-600 border border-neutral-200/60 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xxs">
+                    <span className="inline-flex items-center bg-neutral-50 text-neutral-600 border border-neutral-200/60 px-2 py-1 rounded-lg text-xs font-semibold shadow-xxs">
                       {s.category}
                     </span>
                   </TableCell>
 
                   {/* Actions */}
                   <TableCell className="px-6 py-4 align-middle text-right pr-6">
-                    <div className="flex items-center justify-end gap-3.5">
+                    <div className="flex items-center justify-end gap-3">
                       <button 
                         onClick={() => navigate(`/govt-schemes/${s.id}`)}
-                        className="text-neutral-400 hover:text-primary p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                        className="text-neutral-400 hover:text-primary p-1 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
                         title="View Details"
                       >
                         <Eye size={14} />
@@ -260,21 +260,23 @@ export default function GovtSchemes() {
 
                       <button 
                         onClick={() => navigate(`/govt-schemes/edit/${s.id}`)}
-                        className="text-neutral-400 hover:text-primary p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                        className="text-neutral-400 hover:text-primary p-1 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
                         title="Edit Scheme"
                       >
                         <Edit size={14} />
                       </button>
 
                       <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button 
-                            className="text-neutral-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
-                            title="Delete Scheme"
-                          >
-                            <Trash size={14} />
-                          </button>
-                        </AlertDialogTrigger>
+                        <AlertDialogTrigger
+                          render={
+                            <button 
+                              className="text-neutral-400 hover:text-red-500 p-1 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                              title="Delete Scheme"
+                            >
+                              <Trash size={14} />
+                            </button>
+                          }
+                        />
                         <AlertDialogContent className="rounded-2xl border border-neutral-200 shadow-md">
                           <AlertDialogHeader>
                             <AlertDialogTitle className="text-sm font-bold text-neutral-800">Delete Welfare Scheme</AlertDialogTitle>

@@ -12,7 +12,8 @@ import GovtSchemes from './pages/GovtSchemes';
 import GovtSchemeForm from './pages/GovtSchemeForm';
 import GovtSchemeDetails from './pages/GovtSchemeDetails';
 import ImportantContacts from './pages/ImportantContacts';
-import Megaphone from './pages/Megaphone';
+import Emergency from './pages/Emergency';
+import Staff from './pages/Staff';
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
         element: <Citizens />
       },
       {
+        path: 'staff',
+        element: <Staff />
+      },
+      {
         path: 'complaints',
         element: <Complaints />
       },
@@ -81,7 +86,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'emergency-alert',
-        element: <Megaphone />
+        element: <Emergency />
       },
       {
         path: '*',

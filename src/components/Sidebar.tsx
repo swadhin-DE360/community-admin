@@ -12,8 +12,21 @@ import {
   Truck,
   Users,
   Building2,
-  Contact
+  Contact,
+  LogOut,
+  UserCog
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -79,6 +92,12 @@ export default function Sidebar({
       icon: Megaphone,
       badge: alertsCount > 0 ? alertsCount : null,
       badgeColor: 'bg-red-500 text-white'
+    },
+    { 
+      path: '/staff', 
+      label: 'Staff Directory', 
+      icon: UserCog,
+      badge: null
     }
   ];
 
@@ -125,14 +144,14 @@ export default function Sidebar({
           {/* Collapse Arrow Toggle (Desktop only) */}
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="hidden lg:flex p-1.5 rounded-lg bg-neutral-100 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200/60 transition-colors"
+            className="hidden lg:flex p-1 rounded-lg bg-neutral-100 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200/60 transition-colors"
           >
             {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
           </button>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -142,7 +161,7 @@ export default function Sidebar({
                 onClick={() => {
                   if (window.innerWidth < 1024) setIsOpen(false); // Auto close mobile
                 }}
-                className={({ isActive }) => `w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative ${
+                className={({ isActive }) => `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative ${
                   isActive 
                     ? 'bg-primary text-white shadow-md shadow-emerald-700/20' 
                     : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100'
@@ -171,7 +190,7 @@ export default function Sidebar({
                       <div className="absolute left-20 scale-0 group-hover:scale-100 transition-all origin-left duration-200 bg-neutral-900 border border-neutral-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none whitespace-nowrap z-50">
                         {item.label}
                         {item.badge !== null && (
-                          <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-extrabold bg-primary rounded-full text-white">
+                          <span className="ml-1 px-1 py-0 text-[9px] font-extrabold bg-primary rounded-full text-white">
                             {item.badge}
                           </span>
                         )}
@@ -184,13 +203,52 @@ export default function Sidebar({
           })}
         </nav>
 
-        {/* Footer Info */}
-        <div className="p-4 border-t border-neutral-100 text-center overflow-hidden">
-          {isOpen ? (
-            <p className="text-[10px] text-neutral-400 font-medium">© 2026 Ward 18 BBMP</p>
-          ) : (
-            <span className="text-[10px] text-neutral-400 font-semibold">W18</span>
-          )}
+        {/* Logout Button */}
+        <div className="px-3 py-2 border-t border-neutral-100">
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <button
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative text-red-600 hover:text-red-700 hover:bg-red-50 focus:outline-none cursor-pointer"
+                >
+                  <LogOut 
+                    size={19} 
+                    className="flex-shrink-0 text-red-500 group-hover:text-red-600 transition-transform group-hover:scale-105" 
+                  />
+                  {isOpen && (
+                    <span className="truncate flex-1 text-left font-semibold">Logout</span>
+                  )}
+                  
+                  {/* Collapsed Hover Tooltip (Desktop only) */}
+                  {!isOpen && (
+                    <div className="absolute left-20 scale-0 group-hover:scale-100 transition-all origin-left duration-200 bg-neutral-900 border border-neutral-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none whitespace-nowrap z-50">
+                      Logout
+                    </div>
+                  )}
+                </button>
+              }
+            />
+            <AlertDialogContent className="rounded-2xl border border-neutral-200 shadow-md">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-sm font-bold text-neutral-800">Confirm Logout</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs text-neutral-500">
+                  Are you sure you want to log out of the WARD 18 Admin Panel?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-4 gap-2">
+                <AlertDialogCancel className="text-xs font-semibold rounded-xl hover:bg-neutral-100 transition-colors">Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => {
+                    console.log('Logging out...');
+                    window.location.href = '/';
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
+                >
+                  Logout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </aside>
     </>

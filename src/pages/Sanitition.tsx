@@ -60,7 +60,7 @@ export default function Sanitition() {
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold ${s.color}`}>
                   <Icon size={20} />
                 </div>
-                <span className="text-[10px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0 rounded-full uppercase tracking-wider">
                   Live
                 </span>
               </div>
@@ -82,11 +82,11 @@ export default function Sanitition() {
         {/* Left: Sanitation Grievances (7 cols) */}
         <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex flex-col">
           <div className="mb-4">
-            <h2 className="text-lg font-bold text-charcoal flex items-center gap-1.5">
+            <h2 className="text-lg font-bold text-charcoal flex items-center gap-1">
               <Sparkles size={18} className="text-emerald-600" />
               Active Sanitation Complaints ({sanitationComplaints.length})
             </h2>
-            <p className="text-neutral-500 text-xs mt-0.5">Complaints categorized under Waste Management or Water Supply.</p>
+            <p className="text-neutral-500 text-xs mt-0">Complaints categorized under Waste Management or Water Supply.</p>
           </div>
 
           <div className="space-y-4 overflow-y-auto max-h-[400px] pr-1">
@@ -96,10 +96,10 @@ export default function Sanitition() {
                   <div className="space-y-2 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs font-extrabold text-neutral-700">{c.id}</span>
-                      <span className="text-[10px] font-bold bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold bg-neutral-100 text-neutral-500 px-2 py-0 rounded">
                         {c.category}
                       </span>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-extrabold ${
+                      <span className={`inline-flex items-center gap-1 px-2 py-0 rounded text-[9px] font-extrabold ${
                         c.status === 'Pending' 
                           ? 'bg-amber-100 text-amber-800' 
                           : c.status === 'In Progress' 
@@ -138,7 +138,7 @@ export default function Sanitition() {
 
         {/* Right: Sanitation Command & Crew (5 cols) */}
         <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm h-fit">
-          <h2 className="text-lg font-bold text-charcoal mb-4 flex items-center gap-1.5">
+          <h2 className="text-lg font-bold text-charcoal mb-4 flex items-center gap-1">
             <Users size={18} className="text-emerald-600" />
             Sanitation Leadership Directory
           </h2>
@@ -156,7 +156,7 @@ export default function Sanitition() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 border-t border-neutral-150/40 pt-3 mt-3 text-xs text-neutral-600">
+                <div className="space-y-1 border-t border-neutral-150/40 pt-3 mt-3 text-xs text-neutral-600">
                   <div className="flex items-center gap-2">
                     <Phone size={13} className="text-neutral-400" />
                     <a href={`tel:${c.phone}`} className="hover:text-primary transition-colors font-medium">{c.phone}</a>
@@ -176,7 +176,7 @@ export default function Sanitition() {
             <Truck size={24} className="text-emerald-400 flex-shrink-0" />
             <div className="text-xs">
               <span className="font-bold block">Sanitation Duty Command</span>
-              <p className="text-emerald-300 mt-0.5 font-medium leading-snug">All 4 sweeping zones are logged. Next inspection round scheduled at 05:00 PM.</p>
+              <p className="text-emerald-300 mt-0 font-medium leading-snug">All 4 sweeping zones are logged. Next inspection round scheduled at 05:00 PM.</p>
             </div>
           </div>
         </div>

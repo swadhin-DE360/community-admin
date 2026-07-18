@@ -142,9 +142,9 @@ export default function Campaigns() {
         </div>
         <button
           onClick={() => navigate('/campaign/new')}
-          className="flex-shrink-0 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors flex items-center gap-1.5 self-start sm:self-center"
+          className="flex-shrink-0 px-4 py-3 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors flex items-center gap-1 self-start sm:self-center"
         >
-          Add / Create Drive
+          Create Drive
         </button>
       </div>
 
@@ -177,7 +177,7 @@ export default function Campaigns() {
           </Select>
 
           {/* Date Range Filters */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-neutral-50/50 px-2.5 py-1.5 rounded-xl border border-neutral-200/50">
+          <div className="flex flex-wrap items-center gap-1 bg-neutral-50/50 px-2 py-1 rounded-xl border border-neutral-200/50">
             <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">From</span>
             <Input 
               type="date" 
@@ -237,16 +237,16 @@ export default function Campaigns() {
                     </TableCell>
                     {/* Title & Type */}
                     <TableCell className="p-4">
-                      <div className="flex flex-col gap-1.5 max-w-[220px] whitespace-normal">
+                      <div className="flex flex-col gap-1 max-w-[220px] whitespace-normal">
                         <span className="font-bold text-neutral-800 text-sm leading-snug">{c.title}</span>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-extrabold w-fit border ${style.theme}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0 rounded text-[9px] font-extrabold w-fit border ${style.theme}`}>
                           {c.type}
                         </span>
                       </div>
                     </TableCell>
                     {/* Schedule */}
                     <TableCell className="p-4 text-neutral-500">
-                      <div className="flex flex-col gap-0.5">
+                      <div className="flex flex-col gap-0">
                         <span className="font-semibold text-neutral-700">{c.date}</span>
                         <span className="text-[10px] text-neutral-400 font-medium">{c.time}</span>
                       </div>
@@ -265,24 +265,24 @@ export default function Campaigns() {
                     </TableCell>
                     {/* Actions */}
                     <TableCell className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => navigate(`/campaign/details/${c.id}`)}
-                          className="text-neutral-400 hover:text-neutral-800 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                          className="text-neutral-400 hover:text-neutral-800 p-1 rounded-lg hover:bg-neutral-100 transition-colors"
                           title="View Details"
                         >
                           <Eye size={14} />
                         </button>
                         <button
                           onClick={() => navigate(`/campaign/edit/${c.id}`)}
-                          className="text-neutral-400 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+                          className="text-neutral-400 hover:text-blue-500 p-1 rounded-lg hover:bg-blue-50 transition-colors"
                           title="Edit Campaign"
                         >
                           <Pencil size={13} />
                         </button>
                         <button
                           onClick={() => setCampaignIdToDelete(c.id)}
-                          className="text-neutral-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          className="text-neutral-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-colors"
                           title="Delete Campaign"
                         >
                           <Trash2 size={14} />

@@ -7,8 +7,7 @@ import {
   User, 
   Calendar,
   Tag,
-  Clock,
-  ShieldCheck
+  Clock
 } from 'lucide-react';
 import { initialComplaints } from '../mockData';
 import type { Complaint } from '../mockData';
@@ -30,7 +29,6 @@ export default function ComplaintDetails() {
 
   // Edit states
   const [status, setStatus] = useState<Complaint['status']>('Pending');
-  const [engineer, setEngineer] = useState('Unassigned');
   const [closureComment, setClosureComment] = useState('');
 
   // Load the specific complaint from localStorage or initial list
@@ -41,7 +39,6 @@ export default function ComplaintDetails() {
     if (found) {
       setComplaint(found);
       setStatus(found.status);
-      setEngineer(found.engineer);
       setClosureComment(found.closureComment || '');
     }
   }, [id]);
@@ -101,7 +98,7 @@ export default function ComplaintDetails() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/complaints')}
-            className="p-2.5 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
+            className="p-2 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
             title="Back to Complaints"
           >
             <ArrowLeft size={18} />
@@ -109,7 +106,7 @@ export default function ComplaintDetails() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] uppercase font-extrabold tracking-widest text-neutral-400">Complaints Registry</span>
-              <span className="px-2 py-0.5 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
+              <span className="px-2 py-0 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
                 {complaint.id}
               </span>
             </div>
@@ -118,14 +115,14 @@ export default function ComplaintDetails() {
         </div>
 
         <div className="flex items-center">
-          <span className={`px-3.5 py-1.5 rounded-2xl text-xs font-bold border shadow-xs flex items-center gap-1.5 ${
+          <span className={`px-3 py-1 rounded-2xl text-xs font-bold border shadow-xs flex items-center gap-1 ${
             complaint.status === 'Pending' 
               ? 'bg-amber-50 border-amber-200/80 text-amber-800' 
               : complaint.status === 'In Progress' 
               ? 'bg-blue-50 border-blue-200/80 text-blue-800' 
               : 'bg-emerald-50 border-emerald-200/80 text-emerald-800'
           }`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${
+            <span className={`w-1 h-1 rounded-full ${
               complaint.status === 'Pending' 
                 ? 'bg-amber-500' 
                 : complaint.status === 'In Progress' 
@@ -151,16 +148,16 @@ export default function ComplaintDetails() {
               <h2 className="text-2xl font-black text-neutral-900 leading-tight tracking-tight">{complaint.title}</h2>
               
               <div className="flex flex-wrap gap-3 text-xs font-semibold text-neutral-600">
-                <span className="flex items-center gap-1.5 bg-neutral-50 px-3 py-1.5 rounded-xl border border-neutral-250/60 shadow-xxs">
+                <span className="flex items-center gap-1 bg-neutral-50 px-3 py-1 rounded-xl border border-neutral-250/60 shadow-xxs">
                   <Tag size={13} className="text-neutral-400" />
                   {complaint.category}
                 </span>
-                <span className="flex items-center gap-1.5 bg-neutral-50 px-3 py-1.5 rounded-xl border border-neutral-250/60 shadow-xxs">
+                <span className="flex items-center gap-1 bg-neutral-50 px-3 py-1 rounded-xl border border-neutral-250/60 shadow-xxs">
                   <Calendar size={13} className="text-neutral-400" />
                   {datePart}
                 </span>
                 {timePart && (
-                  <span className="flex items-center gap-1.5 bg-neutral-50 px-3 py-1.5 rounded-xl border border-neutral-250/60 shadow-xxs">
+                  <span className="flex items-center gap-1 bg-neutral-50 px-3 py-1 rounded-xl border border-neutral-250/60 shadow-xxs">
                     <Clock size={13} className="text-neutral-400" />
                     {timePart}
                   </span>
@@ -198,27 +195,27 @@ export default function ComplaintDetails() {
             <span className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider block">Reporting Citizen Contact Info</span>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-semibold">
-              <div className="flex items-center gap-3.5 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50">
+              <div className="flex items-center gap-3 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50">
                 <User size={18} className="text-neutral-400 flex-shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Citizen Name</span>
-                  <span className="text-neutral-800 mt-0.5 font-bold">{complaint.residentName}</span>
+                  <span className="text-neutral-800 mt-0 font-bold">{complaint.residentName}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50">
+              <div className="flex items-center gap-3 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50">
                 <Phone size={18} className="text-neutral-400 flex-shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Phone Number</span>
-                  <span className="text-neutral-800 mt-0.5 font-bold">{complaint.residentPhone}</span>
+                  <span className="text-neutral-800 mt-0 font-bold">{complaint.residentPhone}</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3.5 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50 sm:col-span-2">
+              <div className="flex items-start gap-3 p-4 bg-neutral-50/50 rounded-2xl border border-neutral-200/50 transition-colors hover:bg-neutral-50 sm:col-span-2">
                 <MapPin size={18} className="text-neutral-400 mt-1 flex-shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Residential Address</span>
-                  <span className="text-neutral-600 font-semibold leading-relaxed mt-0.5">{complaint.residentAddress}</span>
+                  <span className="text-neutral-600 font-semibold leading-relaxed mt-0">{complaint.residentAddress}</span>
                 </div>
               </div>
             </div>
@@ -239,7 +236,7 @@ export default function ComplaintDetails() {
 
             {/* 1. Change Status */}
             <div className="space-y-2">
-              <label className="text-[10px] uppercase font-extrabold text-neutral-500 tracking-wider block flex items-center gap-1.5">
+              <label className="text-[10px] uppercase font-extrabold text-neutral-500 tracking-wider block flex items-center gap-1">
                 Update Current Status
               </label>
               <Select value={status} onValueChange={(val) => setStatus(val as Complaint['status'])} disabled={complaint.status === 'Resolved'}>
@@ -267,7 +264,7 @@ export default function ComplaintDetails() {
                   value={closureComment}
                   onChange={(e) => setClosureComment(e.target.value)}
                   rows={4}
-                  className="w-full p-3.5 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 placeholder:text-neutral-400 font-semibold"
+                  className="w-full p-3 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 placeholder:text-neutral-400 font-semibold"
                   required
                   disabled={complaint.status === 'Resolved'}
                 />

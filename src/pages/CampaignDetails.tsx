@@ -74,7 +74,7 @@ export default function CampaignDetails() {
           </button>
           <div>
             <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest block">Drive Details</span>
-            <h1 className="text-xl font-bold text-neutral-800 leading-snug mt-0.5">{campaign.title}</h1>
+            <h1 className="text-xl font-bold text-neutral-800 leading-snug mt-0">{campaign.title}</h1>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export default function CampaignDetails() {
             variant="outline"
             size="sm"
             onClick={() => navigate(`/campaign/edit/${campaign.id}`)}
-            className="h-8.5 text-xs font-bold rounded-xl flex items-center gap-1.5"
+            className="h-8 text-xs font-bold rounded-xl flex items-center gap-1"
           >
             <Pencil size={13} />
             Edit
@@ -91,7 +91,7 @@ export default function CampaignDetails() {
             variant="destructive"
             size="sm"
             onClick={() => setIsDeleteDialogOpen(true)}
-            className="h-8.5 text-xs font-bold rounded-xl flex items-center gap-1.5"
+            className="h-8 text-xs font-bold rounded-xl flex items-center gap-1"
           >
             <Trash2 size={13} />
             Delete
@@ -102,7 +102,7 @@ export default function CampaignDetails() {
       {/* Main Card */}
       <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-sm overflow-hidden">
         {/* Banner accent */}
-        <div className="h-2.5 bg-primary/10 w-full" />
+        <div className="h-2 bg-primary/10 w-full" />
         
         <div className="p-6 space-y-6 text-neutral-700">
           
@@ -114,7 +114,7 @@ export default function CampaignDetails() {
             </div>
             <div>
               <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-1 text-right">Category</span>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-extrabold border ${getTypeStyles(campaign.type)}`}>
+              <span className={`inline-flex items-center px-2 py-0 rounded text-[10px] font-extrabold border ${getTypeStyles(campaign.type)}`}>
                 {campaign.type}
               </span>
             </div>
@@ -128,7 +128,7 @@ export default function CampaignDetails() {
                 <Calendar size={16} />
               </div>
               <div>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">Scheduled Date</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Scheduled Date</span>
                 <span className="text-sm font-bold text-neutral-850">{campaign.date}</span>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function CampaignDetails() {
                 <Clock size={16} />
               </div>
               <div>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">Time Slot</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Time Slot</span>
                 <span className="text-sm font-bold text-neutral-850">{campaign.time}</span>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function CampaignDetails() {
                 <MapPin size={16} />
               </div>
               <div>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">Venue Location</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Venue Location</span>
                 <span className="text-sm font-bold text-neutral-850">{campaign.venue}</span>
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function CampaignDetails() {
                 <User size={16} />
               </div>
               <div>
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0.5">Organizer Details</span>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Organizer Details</span>
                 <span className="text-sm font-bold text-neutral-850">{campaign.organizer}</span>
               </div>
             </div>

@@ -175,7 +175,7 @@ export default function Citizens() {
         </div>
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex-shrink-0 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors flex items-center gap-1.5 self-start sm:self-center"
+          className="flex-shrink-0 px-4 py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors flex items-center gap-1 self-start sm:self-center"
         >
           <Plus size={14} />
           Register Citizen
@@ -228,7 +228,7 @@ export default function Citizens() {
                     </TableCell>
                     {/* Name */}
                     <TableCell className="p-4 font-bold text-neutral-850 text-sm">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2">
                         <img 
                           src={c.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(c.name)}`}
                           alt={c.name}
@@ -254,17 +254,17 @@ export default function Citizens() {
                     </TableCell>
                     {/* Actions */}
                     <TableCell className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setSelectedCitizenForView(c)}
-                          className="text-neutral-400 hover:text-neutral-800 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                          className="text-neutral-400 hover:text-neutral-800 p-1 rounded-lg hover:bg-neutral-100 transition-colors"
                           title="View Profile Details"
                         >
                           <Eye size={14} />
                         </button>
                         <button
                           onClick={() => setCitizenIdToDelete(c.id)}
-                          className="text-neutral-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          className="text-neutral-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition-colors"
                           title="Delete Citizen"
                         >
                           <Trash2 size={14} />
@@ -360,8 +360,8 @@ export default function Citizens() {
                 />
                 <div>
                   <h4 className="text-base font-extrabold text-neutral-850">{selectedCitizenForView.name}</h4>
-                  <p className="text-xs text-neutral-500 font-semibold mt-0.5">{selectedCitizenForView.age} yrs / {selectedCitizenForView.gender}</p>
-                  <span className="inline-block mt-1.5 text-[9px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                  <p className="text-xs text-neutral-500 font-semibold mt-0">{selectedCitizenForView.age} yrs / {selectedCitizenForView.gender}</p>
+                  <span className="inline-block mt-1 text-[9px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0 rounded uppercase tracking-wider">
                     ID: {selectedCitizenForView.id}
                   </span>
                 </div>
@@ -509,7 +509,7 @@ export default function Citizens() {
                           </div>
                         </>
                       ) : (
-                        <div className="flex flex-col items-center gap-1.5 text-neutral-400 group-hover:text-primary transition-colors p-2 text-center select-none">
+                        <div className="flex flex-col items-center gap-1 text-neutral-400 group-hover:text-primary transition-colors p-2 text-center select-none">
                           <Plus size={18} />
                           <span className="text-[10px] font-bold uppercase tracking-wider">Upload Photo</span>
                         </div>
@@ -533,7 +533,7 @@ export default function Citizens() {
                     value={newAddress}
                     onChange={(e) => setNewAddress(e.target.value)}
                     rows={3}
-                    className="w-full p-2.5 text-xs bg-transparent border border-input rounded-xl focus:outline-none focus:ring-3 focus:ring-ring/50 transition-all text-neutral-700 font-semibold resize-none placeholder:text-neutral-400"
+                    className="w-full p-2 text-xs bg-transparent border border-input rounded-xl focus:outline-none focus:ring-3 focus:ring-ring/50 transition-all text-neutral-700 font-semibold resize-none placeholder:text-neutral-400"
                     required
                   />
                 </div>

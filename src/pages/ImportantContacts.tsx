@@ -82,7 +82,7 @@ export default function ImportantContacts() {
 
         <button
           onClick={() => setShowContactForm(!showContactForm)}
-          className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md shadow-emerald-500/10 transition-colors text-xs font-extrabold flex items-center justify-center gap-1.5"
+          className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md shadow-emerald-500/10 transition-colors text-xs font-extrabold flex items-center justify-center gap-1"
         >
           <Plus size={14} />
           Add Directory Contact
@@ -93,7 +93,7 @@ export default function ImportantContacts() {
       {showContactForm && (
         <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm animate-fadeIn">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-sm text-charcoal flex items-center gap-1.5">
+            <h3 className="font-bold text-sm text-charcoal flex items-center gap-1">
               <Sparkles size={16} className="text-primary" />
               Add Ward Directory Contact
             </h3>
@@ -182,7 +182,7 @@ export default function ImportantContacts() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 border-t border-neutral-100 pt-3 text-xs text-neutral-600">
+                <div className="space-y-1 border-t border-neutral-100 pt-3 text-xs text-neutral-600">
                   <div className="flex items-center gap-2">
                     <Phone size={13} className="text-neutral-400" />
                     <a href={`tel:${d.phone}`} className="hover:text-primary transition-colors font-medium">{d.phone}</a>

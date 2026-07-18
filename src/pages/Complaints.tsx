@@ -180,7 +180,7 @@ export default function Complaints() {
                   <TableCell className="p-4">
                     <div className="flex flex-col">
                       <span className="font-semibold text-charcoal line-clamp-1">{c.title}</span>
-                      <span className="text-xs text-neutral-400 font-semibold mt-0.5">{c.category}</span>
+                      <span className="text-xs text-neutral-400 font-semibold mt-0">{c.category}</span>
                     </div>
                   </TableCell>
                   {/* Date */}
@@ -193,14 +193,14 @@ export default function Complaints() {
                   </TableCell>
                   {/* Status Pill */}
                   <TableCell className="p-4">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
                       c.status === 'Pending' 
                         ? 'bg-amber-100 text-amber-800' 
                         : c.status === 'In Progress' 
                         ? 'bg-blue-100 text-blue-800' 
                         : 'bg-emerald-100 text-emerald-800'
                     }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${
+                      <span className={`w-1 h-1 rounded-full ${
                         c.status === 'Pending' 
                           ? 'bg-amber-500' 
                           : c.status === 'In Progress' 
@@ -217,7 +217,7 @@ export default function Complaints() {
                         e.stopPropagation();
                         handleRowClick(c);
                       }}
-                      className="text-neutral-400 hover:text-neutral-800 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                      className="text-neutral-400 hover:text-neutral-800 p-1 rounded-lg hover:bg-neutral-100 transition-colors"
                       title="View Complaint Details"
                     >
                       <Eye size={14} />

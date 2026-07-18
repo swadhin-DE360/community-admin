@@ -79,7 +79,7 @@ export default function GovtSchemeDetails() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/govt-schemes')}
-            className="p-2.5 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
+            className="p-2 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
             title="Back to Schemes"
           >
             <ArrowLeft size={18} />
@@ -87,7 +87,7 @@ export default function GovtSchemeDetails() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] uppercase font-extrabold tracking-widest text-neutral-400">Government Schemes</span>
-              <span className="px-2 py-0.5 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
+              <span className="px-2 py-0 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
                 {scheme.id}
               </span>
             </div>
@@ -99,7 +99,7 @@ export default function GovtSchemeDetails() {
 
         <Button
           onClick={() => navigate(`/govt-schemes/edit/${scheme.id}`)}
-          className="px-4 h-11 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold tracking-wide shadow-md flex items-center gap-1.5"
+          className="px-4 h-11 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold tracking-wide shadow-md flex items-center gap-1"
         >
           <Edit size={14} />
           <span>Edit</span>
@@ -130,7 +130,7 @@ export default function GovtSchemeDetails() {
           <label className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider block">Eligibility Criteria</label>
           <div className="p-5 bg-emerald-50/30 border border-emerald-100 rounded-2xl text-xs font-semibold text-emerald-800 leading-relaxed">
             {Array.isArray(scheme.eligibility) ? (
-              <ul className="list-disc pl-4 space-y-1.5">
+              <ul className="list-disc pl-4 space-y-1">
                 {scheme.eligibility.map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}
@@ -146,7 +146,7 @@ export default function GovtSchemeDetails() {
           <label className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider block">Key Benefits</label>
           <div className="p-5 bg-indigo-50/30 border border-indigo-100 rounded-2xl text-xs font-semibold text-indigo-800 leading-relaxed">
             {Array.isArray(scheme.keyBenefits) ? (
-              <ul className="list-disc pl-4 space-y-1.5">
+              <ul className="list-disc pl-4 space-y-1">
                 {scheme.keyBenefits.map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}
@@ -162,7 +162,7 @@ export default function GovtSchemeDetails() {
           <label className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider block">Required Documents</label>
           <div className="p-5 bg-amber-50/30 border border-amber-100 rounded-2xl text-xs font-semibold text-amber-800 leading-relaxed">
             {Array.isArray(scheme.requiredDocuments) ? (
-              <ul className="list-disc pl-4 space-y-1.5">
+              <ul className="list-disc pl-4 space-y-1">
                 {scheme.requiredDocuments.map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}

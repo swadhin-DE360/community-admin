@@ -58,7 +58,7 @@ export default function Overview() {
           <h1 className="text-2xl font-bold text-charcoal">Ward 18 Dashboard Overview</h1>
           <p className="text-neutral-500 text-sm mt-1">Real-time civic monitoring, complaint tracking, and alert systems.</p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 bg-neutral-100 px-3 py-1.5 rounded-lg w-fit">
+        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 bg-neutral-100 px-3 py-1 rounded-lg w-fit">
           <Clock size={14} className="text-neutral-500" />
           Last synced: Just Now
         </div>
@@ -73,7 +73,7 @@ export default function Overview() {
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
               <Users size={20} />
             </div>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0 rounded-full flex items-center gap-0">
               +2.4% <ArrowUpRight size={10} />
             </span>
           </div>
@@ -95,7 +95,7 @@ export default function Overview() {
             <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
               <FileText size={20} />
             </div>
-            <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0 rounded-full">
               Live Tracker
             </span>
           </div>
@@ -106,10 +106,10 @@ export default function Overview() {
           
           {/* Breakdown pill indicators */}
           <div className="border-t border-neutral-100 mt-4 pt-3 flex gap-2">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700">
+            <span className="text-[10px] font-bold px-2 py-0 rounded-md bg-amber-100 text-amber-700">
               {pendingCount} Pending
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-100 text-blue-700">
+            <span className="text-[10px] font-bold px-2 py-0 rounded-md bg-blue-100 text-blue-700">
               {inProgressCount} In Progress
             </span>
           </div>
@@ -126,15 +126,15 @@ export default function Overview() {
                 <Megaphone size={20} />
               </div>
               {activeAlertsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white animate-ping"></span>
               )}
             </div>
             {activeAlertsCount > 0 ? (
-              <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full animate-pulse">
+              <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0 rounded-full animate-pulse">
                 Broadcast Live
               </span>
             ) : (
-              <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0 rounded-full">
                 Inactive
               </span>
             )}
@@ -157,7 +157,7 @@ export default function Overview() {
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
               <Calendar size={20} />
             </div>
-            <span className="text-[10px] font-bold text-primary bg-primary-light px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-primary bg-primary-light px-2 py-0 rounded-full">
               Planner
             </span>
           </div>
@@ -179,19 +179,19 @@ export default function Overview() {
         <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex flex-col justify-between">
           <div>
             <h2 className="text-lg font-bold text-charcoal">Complaints Closure Performance</h2>
-            <p className="text-neutral-500 text-xs mt-0.5">Summary of community issue resolution efficacy.</p>
+            <p className="text-neutral-500 text-xs mt-0">Summary of community issue resolution efficacy.</p>
           </div>
 
           <div className="my-6 space-y-5">
             {/* Resolution rate progress bar */}
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
+              <div className="flex justify-between text-xs font-semibold mb-1">
                 <span className="text-neutral-600">Resolution Rate</span>
                 <span className="text-emerald-700 font-bold">
                   {complaints.length > 0 ? Math.round((resolvedCount / complaints.length) * 100) : 0}%
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-primary rounded-full transition-all duration-500" 
                   style={{ width: `${complaints.length > 0 ? (resolvedCount / complaints.length) * 100 : 0}%` }}
@@ -200,10 +200,10 @@ export default function Overview() {
             </div>
 
             {/* Status breakdown progress tracks */}
-            <div className="space-y-3.5 pt-3">
+            <div className="space-y-3 pt-3">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 font-medium text-neutral-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span>Resolved Complaints</span>
                 </div>
                 <span className="font-bold text-charcoal">{resolvedCount}</span>
@@ -211,7 +211,7 @@ export default function Overview() {
 
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 font-medium text-neutral-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                   <span>In Progress</span>
                 </div>
                 <span className="font-bold text-charcoal">{inProgressCount}</span>
@@ -219,7 +219,7 @@ export default function Overview() {
 
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 font-medium text-neutral-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                   <span>Pending (Awaiting Action)</span>
                 </div>
                 <span className="font-bold text-charcoal">{pendingCount}</span>
@@ -231,17 +231,17 @@ export default function Overview() {
           <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-150 flex justify-between items-center text-center">
             <div className="flex-1">
               <span className="text-[10px] uppercase font-bold text-neutral-400">Total Logged</span>
-              <span className="block text-xl font-extrabold text-charcoal mt-0.5">{complaints.length}</span>
+              <span className="block text-xl font-extrabold text-charcoal mt-0">{complaints.length}</span>
             </div>
             <div className="w-px h-8 bg-neutral-200"></div>
             <div className="flex-1">
               <span className="text-[10px] uppercase font-bold text-neutral-400">Resolved</span>
-              <span className="block text-xl font-extrabold text-primary mt-0.5">{resolvedCount}</span>
+              <span className="block text-xl font-extrabold text-primary mt-0">{resolvedCount}</span>
             </div>
             <div className="w-px h-8 bg-neutral-200"></div>
             <div className="flex-1">
               <span className="text-[10px] uppercase font-bold text-neutral-400">Avg Restoral</span>
-              <span className="block text-xl font-extrabold text-charcoal mt-0.5">36h</span>
+              <span className="block text-xl font-extrabold text-charcoal mt-0">36h</span>
             </div>
           </div>
         </div>
@@ -250,17 +250,17 @@ export default function Overview() {
         <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm flex flex-col">
           <div className="mb-4">
             <h2 className="text-lg font-bold text-charcoal">Recent Activity Feed</h2>
-            <p className="text-neutral-500 text-xs mt-0.5">Timeline of late-breaking alerts and civic submissions.</p>
+            <p className="text-neutral-500 text-xs mt-0">Timeline of late-breaking alerts and civic submissions.</p>
           </div>
 
           {/* Timeline Feed */}
-          <div className="flex-1 space-y-4.5 overflow-y-auto pr-1">
+          <div className="flex-1 space-y-4 overflow-y-auto pr-1">
             {activities.length > 0 ? (
               activities.map((act, index) => (
                 <div key={`${act.id}-${index}`} className="flex gap-4 relative group">
                   {/* Vertical line connecting nodes */}
                   {index !== activities.length - 1 && (
-                    <div className="absolute left-[17px] top-[30px] bottom-[-20px] w-0.5 bg-neutral-100"></div>
+                    <div className="absolute left-[17px] top-[30px] bottom-[-20px] w-0 bg-neutral-100"></div>
                   )}
 
                   {/* Icon Node */}
@@ -283,7 +283,7 @@ export default function Overview() {
                   </div>
 
                   {/* Info Panel */}
-                  <div className="flex-1 bg-neutral-50/50 hover:bg-neutral-50 p-3.5 rounded-xl border border-neutral-150 transition-colors">
+                  <div className="flex-1 bg-neutral-50/50 hover:bg-neutral-50 p-3 rounded-xl border border-neutral-150 transition-colors">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                       <span className="font-semibold text-sm text-charcoal tracking-wide leading-tight">
                         {act.title}
@@ -297,8 +297,8 @@ export default function Overview() {
                     </p>
                     
                     {/* Badge */}
-                    <div className="mt-2.5 flex items-center justify-between">
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${act.badgeColor}`}>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className={`text-[9px] font-bold px-2 py-0 rounded-md ${act.badgeColor}`}>
                         {act.status}
                       </span>
                       <span className="text-[10px] text-neutral-400 font-semibold">{act.id}</span>

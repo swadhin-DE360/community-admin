@@ -180,7 +180,7 @@ export default function GovtSchemeForm() {
       <div className="bg-gradient-to-r from-neutral-50 via-neutral-100/35 to-neutral-50 p-6 rounded-3xl border border-neutral-200/70 shadow-xs flex items-center gap-4">
         <button 
           onClick={() => navigate('/govt-schemes')}
-          className="p-2.5 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
+          className="p-2 rounded-full bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-800 hover:border-neutral-300 hover:shadow-md transition-all active:scale-95 flex items-center justify-center"
           title="Back to Schemes"
         >
           <ArrowLeft size={18} />
@@ -189,7 +189,7 @@ export default function GovtSchemeForm() {
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase font-extrabold tracking-widest text-neutral-400">Government Schemes</span>
             {isEdit && (
-              <span className="px-2 py-0.5 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
+              <span className="px-2 py-0 rounded-lg text-[9px] font-bold bg-neutral-200/60 text-neutral-600 border border-neutral-300/40 font-mono">
                 {id}
               </span>
             )}
@@ -227,8 +227,8 @@ export default function GovtSchemeForm() {
               <label className="text-xs font-bold text-neutral-600 block">Category</label>
               
               {!isAddingNewCategory ? (
-                <div className="space-y-1.5">
-                  <Select value={categorySelect} onValueChange={setCategorySelect}>
+                <div className="space-y-1">
+                  <Select value={categorySelect} onValueChange={(val) => setCategorySelect(val ?? '')}>
                     <SelectTrigger className="w-full h-10 text-xs font-semibold text-neutral-700 rounded-xl bg-neutral-50 border-neutral-200 focus:ring-2 focus:ring-primary/20">
                       <SelectValue placeholder="Select Category" />
                     </SelectTrigger>
@@ -251,7 +251,7 @@ export default function GovtSchemeForm() {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-1.5 animate-fadeIn">
+                <div className="space-y-1 animate-fadeIn">
                   <div className="flex gap-2">
                     <Input 
                       type="text" 
@@ -318,7 +318,7 @@ export default function GovtSchemeForm() {
                 {eligibilityList.map((tag, idx) => (
                   <span 
                     key={idx} 
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
                   >
                     <span>{tag}</span>
                     <button
@@ -346,7 +346,7 @@ export default function GovtSchemeForm() {
               <button
                 type="button"
                 onClick={addEligibilityTag}
-                className="px-3.5 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
+                className="px-3 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
                 title="Add tag"
               >
                 <Plus size={15} />
@@ -364,7 +364,7 @@ export default function GovtSchemeForm() {
                 {keyBenefitsList.map((tag, idx) => (
                   <span 
                     key={idx} 
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
                   >
                     <span>{tag}</span>
                     <button
@@ -392,7 +392,7 @@ export default function GovtSchemeForm() {
               <button
                 type="button"
                 onClick={addKeyBenefitsTag}
-                className="px-3.5 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
+                className="px-3 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
                 title="Add tag"
               >
                 <Plus size={15} />
@@ -410,7 +410,7 @@ export default function GovtSchemeForm() {
                 {requiredDocumentsList.map((tag, idx) => (
                   <span 
                     key={idx} 
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 border border-neutral-200/50 rounded-xl text-xs font-bold text-neutral-700 animate-fadeIn"
                   >
                     <span>{tag}</span>
                     <button
@@ -438,7 +438,7 @@ export default function GovtSchemeForm() {
               <button
                 type="button"
                 onClick={addRequiredDocumentsTag}
-                className="px-3.5 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
+                className="px-3 h-10 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-xl flex items-center justify-center text-neutral-500 hover:text-neutral-800 transition-all active:scale-95 shadow-sm"
                 title="Add tag"
               >
                 <Plus size={15} />
@@ -454,12 +454,12 @@ export default function GovtSchemeForm() {
               value={overview}
               onChange={(e) => setOverview(e.target.value)}
               rows={4}
-              className="w-full p-3.5 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 placeholder:text-neutral-400 font-semibold"
+              className="w-full p-3 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 placeholder:text-neutral-400 font-semibold"
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3.5 pt-4 border-t border-neutral-100">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
             <Button
               type="button"
               variant="outline"
