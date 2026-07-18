@@ -77,7 +77,7 @@ export default function Complaints() {
   });
 
   const handleRowClick = (complaint: Complaint) => {
-    navigate(`/complaints/details/${complaint.id}`);
+    navigate(`/complaints/${complaint.id}`);
   };
 
   // Pagination calculation

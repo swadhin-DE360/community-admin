@@ -1,55 +1,151 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Building2, 
   Search, 
   Plus, 
-  ExternalLink, 
   Trash, 
-  Globe,
-  Sparkles
+  Edit,
+  Eye
 } from 'lucide-react';
 import { initialSchemes } from '../mockData';
 import type { CitizenScheme } from '../mockData';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 export default function GovtSchemes() {
-  const [schemes, setSchemes] = useState<CitizenScheme[]>(initialSchemes);
+  const navigate = useNavigate();
+  const [schemes, setSchemes] = useState<CitizenScheme[]>(() => {
+    const saved = localStorage.getItem('ward18_schemes');
+    if (saved) {
+      const parsed: CitizenScheme[] = JSON.parse(saved);
+      let updated = false;
+      const verified = parsed.map(s => {
+        let needsUpdate = false;
+        const match = initialSchemes.find(i => i.id === s.id);
+        
+        let sOverview = s.overview;
+        if (!sOverview) {
+          // @ts-ignore
+          sOverview = s.description || (match ? match.overview : '');
+          needsUpdate = true;
+        }
+
+        let sCategory = s.category;
+        if (!sCategory) {
+          sCategory = match ? match.category : 'General';
+          needsUpdate = true;
+        }
+
+        let sKeyBenefits = s.keyBenefits;
+        if (!sKeyBenefits || !Array.isArray(sKeyBenefits)) {
+          sKeyBenefits = match ? match.keyBenefits : [];
+          needsUpdate = true;
+        }
+
+        let sEligibility = s.eligibility;
+        if (!sEligibility || !Array.isArray(sEligibility)) {
+          if (match && Array.isArray(match.eligibility)) {
+            sEligibility = match.eligibility;
+          } else {
+            // @ts-ignore
+            sEligibility = sEligibility ? [String(sEligibility)] : [];
+          }
+          needsUpdate = true;
+        }
+
+        let sRequiredDocs = s.requiredDocuments;
+        if (!sRequiredDocs || !Array.isArray(sRequiredDocs)) {
+          sRequiredDocs = match ? match.requiredDocuments : [];
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          updated = true;
+          return {
+            ...s,
+            category: sCategory,
+            keyBenefits: sKeyBenefits,
+            eligibility: sEligibility,
+            requiredDocuments: sRequiredDocs,
+            overview: sOverview
+          };
+        }
+        return s;
+      });
+      if (updated) {
+        localStorage.setItem('ward18_schemes', JSON.stringify(verified));
+      }
+      return verified;
+    }
+    localStorage.setItem('ward18_schemes', JSON.stringify(initialSchemes));
+    return initialSchemes;
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [schemeName, setSchemeName] = useState('');
-  const [schemeEligibility, setSchemeEligibility] = useState('');
-  const [schemeUrl, setSchemeUrl] = useState('');
-  const [schemeDesc, setSchemeDesc] = useState('');
-  const [showSchemeForm, setShowSchemeForm] = useState(false);
-
-  const handleAddSchemeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!schemeName.trim() || !schemeEligibility.trim() || !schemeUrl.trim()) return;
-
-    const newScheme: CitizenScheme = {
-      id: `SCHEME-${Date.now().toString().slice(-4)}`,
-      name: schemeName.trim(),
-      eligibility: schemeEligibility.trim(),
-      applyUrl: schemeUrl.trim().startsWith('http') ? schemeUrl.trim() : `https://${schemeUrl.trim()}`,
-      description: schemeDesc.trim() || "No additional description provided."
-    };
-
-    setSchemes(prev => [newScheme, ...prev]);
-    
-    // Reset Form
-    setSchemeName('');
-    setSchemeEligibility('');
-    setSchemeUrl('');
-    setSchemeDesc('');
-    setShowSchemeForm(false);
-  };
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const handleDeleteScheme = (id: string) => {
-    setSchemes(prev => prev.filter(s => s.id !== id));
+    const updated = schemes.filter(s => s.id !== id);
+    setSchemes(updated);
+    localStorage.setItem('ward18_schemes', JSON.stringify(updated));
+    
+    // Auto-adjust page if current page becomes empty
+    const newTotalPages = Math.ceil(updated.length / itemsPerPage);
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      setCurrentPage(newTotalPages);
+    }
   };
 
-  const filteredSchemes = schemes.filter(s => 
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter schemes
+  const filteredSchemes = schemes.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          s.overview.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || s.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredSchemes.length / itemsPerPage);
+  const activePage = Math.min(currentPage, Math.max(totalPages, 1));
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const paginatedSchemes = filteredSchemes.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="space-y-6">
@@ -69,155 +165,197 @@ export default function GovtSchemes() {
 
       {/* Search & Actions Bar */}
       <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={15} />
-          <input 
-            type="text" 
-            placeholder="Search schemes..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-neutral-400 font-medium text-neutral-700"
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={15} />
+            <input 
+              type="text" 
+              placeholder="Search schemes..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-9 pr-4 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-neutral-400 font-medium text-neutral-700"
+            />
+          </div>
+
+          {/* Category Select Filter */}
+          <div className="w-full sm:w-44">
+            <Select 
+              value={selectedCategory} 
+              onValueChange={(val) => {
+                setSelectedCategory(val);
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-full h-8 text-[11px] font-bold text-neutral-600 rounded-xl bg-neutral-50 border-neutral-200">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-neutral-200 shadow-lg rounded-xl">
+                <SelectItem value="All">All Categories</SelectItem>
+                {Array.from(new Set(schemes.map(s => s.category).filter(Boolean))).map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <button
-          onClick={() => setShowSchemeForm(!showSchemeForm)}
+          onClick={() => navigate('/govt-schemes/new')}
           className="w-full sm:w-auto py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl shadow-md shadow-emerald-500/10 transition-colors text-xs font-extrabold flex items-center justify-center gap-1.5"
         >
           <Plus size={14} />
-          Add Welfare Scheme
+          Add Scheme
         </button>
       </div>
 
-      {/* Add Scheme Form */}
-      {showSchemeForm && (
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm animate-fadeIn">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-sm text-charcoal flex items-center gap-1.5">
-              <Sparkles size={16} className="text-primary" />
-              Add Government Scheme
-            </h3>
-            <button 
-              onClick={() => setShowSchemeForm(false)}
-              className="text-xs text-neutral-400 hover:text-charcoal font-semibold"
-            >
-              Cancel
-            </button>
-          </div>
+      {/* Schemes Table Container */}
+      <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-sm overflow-hidden animate-fadeIn flex flex-col">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-neutral-50/80 border-b border-neutral-200 hover:bg-neutral-50/80">
+              <TableHead className="px-6 py-4 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest w-[15%] h-auto">ID</TableHead>
+              <TableHead className="px-6 py-4 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest w-[45%] h-auto">Scheme Name</TableHead>
+              <TableHead className="px-6 py-4 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest w-[20%] h-auto">Category</TableHead>
+              <TableHead className="px-6 py-4 text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest w-[20%] text-right h-auto pr-6">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="divide-y divide-neutral-100">
+            {paginatedSchemes.length > 0 ? (
+              paginatedSchemes.map((s) => (
+                <TableRow key={s.id} className="hover:bg-neutral-50/30 transition-colors">
+                  
+                  {/* ID */}
+                  <TableCell className="px-6 py-4 align-middle">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50/50 border border-emerald-500/10 px-2 py-0.5 rounded-lg w-fit font-mono">
+                      <span>{s.id}</span>
+                    </div>
+                  </TableCell>
 
-          <form onSubmit={handleAddSchemeSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-neutral-600">Scheme Name</label>
-              <input 
-                type="text" 
-                placeholder="e.g. Solar Rooftop Subvention"
-                value={schemeName}
-                onChange={(e) => setSchemeName(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 font-semibold"
-                required
-              />
+                  {/* Name */}
+                  <TableCell className="px-6 py-4 align-middle whitespace-normal">
+                    <h4 className="font-extrabold text-sm text-charcoal leading-snug">{s.name}</h4>
+                  </TableCell>
+
+                  {/* Category */}
+                  <TableCell className="px-6 py-4 align-middle">
+                    <span className="inline-flex items-center bg-neutral-50 text-neutral-600 border border-neutral-200/60 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-xxs">
+                      {s.category}
+                    </span>
+                  </TableCell>
+
+                  {/* Actions */}
+                  <TableCell className="px-6 py-4 align-middle text-right pr-6">
+                    <div className="flex items-center justify-end gap-3.5">
+                      <button 
+                        onClick={() => navigate(`/govt-schemes/${s.id}`)}
+                        className="text-neutral-400 hover:text-primary p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                        title="View Details"
+                      >
+                        <Eye size={14} />
+                      </button>
+
+                      <button 
+                        onClick={() => navigate(`/govt-schemes/edit/${s.id}`)}
+                        className="text-neutral-400 hover:text-primary p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                        title="Edit Scheme"
+                      >
+                        <Edit size={14} />
+                      </button>
+
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button 
+                            className="text-neutral-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-neutral-50 transition-all flex items-center justify-center border border-transparent hover:border-neutral-200"
+                            title="Delete Scheme"
+                          >
+                            <Trash size={14} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-2xl border border-neutral-200 shadow-md">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-sm font-bold text-neutral-800">Delete Welfare Scheme</AlertDialogTitle>
+                            <AlertDialogDescription className="text-xs text-neutral-500">
+                              Are you sure you want to delete "{s.name}"? This action cannot be undone and will remove the scheme from the public directory.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter className="mt-4 gap-2">
+                            <AlertDialogCancel className="text-xs font-semibold rounded-xl">Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteScheme(s.id)}
+                              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
+                            >
+                              Delete Scheme
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="py-12 text-center text-neutral-400 font-semibold text-xs">
+                  No government welfare schemes found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-neutral-100 p-4 bg-neutral-50/40">
+            <div className="text-[11px] text-neutral-400 font-semibold uppercase tracking-wider">
+              Page {activePage} of {totalPages}
             </div>
-            
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-neutral-600">Apply Portal URL</label>
-              <input 
-                type="text" 
-                placeholder="e.g. www.schemeportal.gov.in"
-                value={schemeUrl}
-                onChange={(e) => setSchemeUrl(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 font-semibold"
-                required
-              />
-            </div>
-
-            <div className="space-y-1 md:col-span-2">
-              <label className="text-xs font-bold text-neutral-600">Eligibility Rules</label>
-              <input 
-                type="text" 
-                placeholder="e.g. State residents with property size less than 1200 sq ft."
-                value={schemeEligibility}
-                onChange={(e) => setSchemeEligibility(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 font-semibold"
-                required
-              />
-            </div>
-
-            <div className="space-y-1 md:col-span-2">
-              <label className="text-xs font-bold text-neutral-600">Scheme Description</label>
-              <textarea 
-                placeholder="Short outline detailing what benefits the scheme distributes..."
-                value={schemeDesc}
-                onChange={(e) => setSchemeDesc(e.target.value)}
-                rows={2}
-                className="w-full p-2.5 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 font-medium"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="md:col-span-2 py-2 px-4 bg-primary hover:bg-primary-hover text-white rounded-xl font-extrabold text-xs shadow-sm transition-colors text-center"
-            >
-              Publish Government Scheme
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* Schemes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredSchemes.length > 0 ? (
-          filteredSchemes.map((s) => (
-            <div 
-              key={s.id} 
-              className="bg-white p-5 rounded-2xl border border-neutral-200 hover:shadow-md hover:border-emerald-500/20 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50/50 border border-emerald-500/10 px-2.5 py-1 rounded-lg w-fit">
-                  <Building2 size={13} />
-                  <span>{s.id}</span>
-                </div>
-                
-                <h3 className="font-extrabold text-sm text-charcoal leading-snug line-clamp-2">{s.name}</h3>
-                <p className="text-neutral-500 text-xs leading-relaxed font-medium line-clamp-3">{s.description}</p>
-              </div>
-
-              <div className="border-t border-neutral-100 mt-4 pt-4 space-y-3">
-                <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-150 text-[11px]">
-                  <span className="font-bold text-neutral-500 block uppercase tracking-wider">Eligibility Rule:</span>
-                  <span className="text-charcoal font-medium mt-0.5 block">{s.eligibility}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <a 
-                    href={s.applyUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-primary hover:text-primary-dark text-xs font-extrabold flex items-center gap-1 hover:underline"
-                  >
-                    <Globe size={13} />
-                    <span>Official Portal</span>
-                    <ExternalLink size={11} />
-                  </a>
-
-                  <button 
-                    onClick={() => handleDeleteScheme(s.id)}
-                    className="text-neutral-400 hover:text-red-500 p-1 rounded transition-colors"
-                    title="Delete Scheme"
-                  >
-                    <Trash size={13} />
-                  </button>
-                </div>
-              </div>
-
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full py-12 text-center text-neutral-400 font-medium">
-            No government schemes found.
+            <Pagination className="mx-0 w-auto">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (activePage > 1) setCurrentPage(activePage - 1);
+                    }}
+                    className={activePage === 1 ? "opacity-50 pointer-events-none" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      href="#"
+                      isActive={activePage === page}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(page);
+                      }}
+                      className="cursor-pointer font-extrabold"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (activePage < totalPages) setCurrentPage(activePage + 1);
+                    }}
+                    className={activePage === totalPages ? "opacity-50 pointer-events-none" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>
-
     </div>
   );
 }

@@ -35,9 +35,12 @@ export interface Campaign {
 export interface CitizenScheme {
   id: string;
   name: string;
-  eligibility: string;
+  category: string;
+  keyBenefits: string[];
+  eligibility: string[];
+  requiredDocuments: string[];
   applyUrl: string;
-  description: string;
+  overview: string;
 }
 
 export interface DirectoryContact {
@@ -179,23 +182,63 @@ export const initialSchemes: CitizenScheme[] = [
   {
     id: "SCHEME-001",
     name: "Gruha Jyothi Electricity Subsidy Scheme",
-    eligibility: "All domestic households consuming less than 200 units of electricity per month are eligible for zero bills.",
+    category: "Utilities",
+    keyBenefits: [
+      "Zero electricity bills for domestic usage under 200 units per month.",
+      "Applies automatically upon registration verification."
+    ],
+    eligibility: [
+      "All domestic households consuming less than 200 units of electricity per month.",
+      "Must possess a valid active domestic consumer ID."
+    ],
+    requiredDocuments: [
+      "Aadhaar Card",
+      "Electricity Bill (recent)",
+      "Rental Agreement (if tenant)"
+    ],
     applyUrl: "https://sevasindhu.karnataka.gov.in",
-    description: "Government subsidy offering free electricity up to 200 units for residents of the state to ease cost-of-living burdens."
+    overview: "Government subsidy offering free electricity up to 200 units for residents of the state to ease cost-of-living burdens."
   },
   {
     id: "SCHEME-002",
     name: "Senior Citizen Medical Benefit Card",
-    eligibility: "Residents aged 60+ years with annual family income less than INR 3 Lakhs.",
+    category: "Healthcare",
+    keyBenefits: [
+      "Cashless health insurance card with coverage up to INR 1.5 Lakhs annually.",
+      "Applicable in all empaneled public & private hospitals."
+    ],
+    eligibility: [
+      "Residents aged 60+ years.",
+      "Annual family income must be less than INR 3 Lakhs."
+    ],
+    requiredDocuments: [
+      "Aadhaar Card",
+      "Income Certificate",
+      "Age Proof (Passport/PAN/Birth Certificate)"
+    ],
     applyUrl: "https://health.karnataka.gov.in",
-    description: "Provides cashless hospitalization cover up to INR 1.5 Lakhs per year in empaneled hospitals."
+    overview: "Provides cashless hospitalization cover up to INR 1.5 Lakhs per year in empaneled hospitals."
   },
   {
     id: "SCHEME-003",
     name: "Ward 18 Green Terrace Subsidy",
-    eligibility: "Independent houses in Ward 18 setup for solar panels or kitchen gardening over 500 sq ft.",
+    category: "Environment",
+    keyBenefits: [
+      "50% subsidy on purchase of kitchen gardening kits and organic seeds.",
+      "Composters and solar installation panels at highly subsidized rates.",
+      "Free rooftop solar feasibility report by ward experts."
+    ],
+    eligibility: [
+      "Independent house residents in Ward 18.",
+      "Setup space for solar panels or kitchen gardening must exceed 500 sq ft."
+    ],
+    requiredDocuments: [
+      "Address Proof",
+      "Property Tax Receipt",
+      "Rooftop Photos"
+    ],
     applyUrl: "https://bbmp.gov.in/green-terrace",
-    description: "A local ward initiative providing 50% discount on seeds, planters, composters, and technical solar installation support."
+    overview: "A local ward initiative providing 50% discount on seeds, planters, composters, and technical solar installation support."
   }
 ];
 

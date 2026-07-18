@@ -9,6 +9,8 @@ import Citizens from './pages/Citizens';
 import Complaints from './pages/Complaints';
 import ComplaintDetails from './pages/ComplaintDetails';
 import GovtSchemes from './pages/GovtSchemes';
+import GovtSchemeForm from './pages/GovtSchemeForm';
+import GovtSchemeDetails from './pages/GovtSchemeDetails';
 import ImportantContacts from './pages/ImportantContacts';
 import Megaphone from './pages/Megaphone';
 
@@ -54,12 +56,24 @@ const router = createBrowserRouter([
         element: <Complaints />
       },
       {
-        path: 'complaints/details/:id',
+        path: 'complaints/:id',
         element: <ComplaintDetails />
       },
       {
         path: 'govt-schemes',
         element: <GovtSchemes />
+      },
+      {
+        path: 'govt-schemes/new',
+        element: <GovtSchemeForm />
+      },
+      {
+        path: 'govt-schemes/edit/:id',
+        element: <GovtSchemeForm />
+      },
+      {
+        path: 'govt-schemes/:id',
+        element: <GovtSchemeDetails />
       },
       {
         path: 'important-contacts',
