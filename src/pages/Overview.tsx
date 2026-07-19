@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { 
   Users, 
   FileText, 
@@ -8,18 +9,22 @@ import {
   Clock, 
   AlertTriangle,
   CheckCircle2,
-  Hourglass
+  Hourglass,
+  Truck,
+  ShieldAlert,
+  UserPlus
 } from 'lucide-react';
 import { initialComplaints, initialAlerts, initialCampaigns } from '../mockData';
 
 export default function Overview() {
   const navigate = useNavigate();
+  
+  // Live states fetched from mockData and localStorage
   const complaints = initialComplaints;
   const alerts = initialAlerts;
   const campaigns = initialCampaigns;
 
-  // Calculations based on live context state
-  const totalResidents = 14280; // Demo base
+  const totalResidents = 14280;
   const activeComplaints = complaints.filter(c => c.status !== 'Resolved').length;
   const pendingCount = complaints.filter(c => c.status === 'Pending').length;
   const inProgressCount = complaints.filter(c => c.status === 'In Progress').length;
@@ -28,7 +33,49 @@ export default function Overview() {
   const activeAlertsCount = alerts.length;
   const upcomingCampaignsCount = campaigns.length;
 
-  // Sorting recent activity (mix of complaints and alerts)
+  // Retrieve Live Sanitation Status from localStorage
+  const [sanitationStatus, setSanitationStatus] = useState({
+    statusText: '8:00 AM (Default)',
+    badgeText: 'Active',
+    badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-100'
+  });
+
+  useEffect(() => {
+    const savedOffDays = localStorage.getItem('sanitation_off_days');
+    const savedChanges = localStorage.getItem('sanitation_schedule_changes');
+    
+    const offDays = savedOffDays ? JSON.parse(savedOffDays) : ['Tuesday', 'Friday'];
+    const changes = savedChanges ? JSON.parse(savedChanges) : [];
+
+    const today = new Date();
+    const todayDayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const todayDateString = today.toISOString().split('T')[0];
+
+    const isTodayOff = offDays.includes(todayDayName);
+    const todayChange = changes.find((c: any) => c.date === todayDateString);
+
+    if (isTodayOff) {
+      setSanitationStatus({
+        statusText: 'No Service Today (Off Day)',
+        badgeText: 'Off Day',
+        badgeColor: 'bg-red-50 text-red-700 border-red-100'
+      });
+    } else if (todayChange) {
+      setSanitationStatus({
+        statusText: `Rescheduled to ${todayChange.time}`,
+        badgeText: 'Rescheduled',
+        badgeColor: 'bg-amber-50 text-amber-700 border-amber-100'
+      });
+    } else {
+      setSanitationStatus({
+        statusText: 'On Schedule - 8:00 AM',
+        badgeText: 'Running',
+        badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-100'
+      });
+    }
+  }, []);
+
+  // Sort recent activity (mix of complaints and alerts)
   const activities = [
     ...complaints.map(c => ({
       id: c.id,
@@ -44,7 +91,7 @@ export default function Overview() {
       type: 'alert',
       title: a.title,
       subtitle: `Emergency Broadcast (${a.severity})`,
-      time: a.datePublished.split(' ')[0], // Date portion
+      time: a.datePublished.split(' ')[0],
       status: a.severity,
       badgeColor: a.severity === 'Critical' ? 'bg-red-100 text-red-800' : a.severity === 'Warning' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
     }))
@@ -52,28 +99,31 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
+      
       {/* Header Panel */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-charcoal">Ward 18 Dashboard Overview</h1>
-          <p className="text-neutral-500 text-sm mt-1">Real-time civic monitoring, complaint tracking, and alert systems.</p>
+          <h1 className="text-2xl font-bold text-charcoal">Ward 18 Admin Portal</h1>
+          <p className="text-neutral-500 text-sm mt-1">
+            Real-time civic monitoring dashboard, service configurations, and public safety broadcast controls.
+          </p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 bg-neutral-100 px-3 py-1 rounded-lg w-fit">
+        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-600 bg-neutral-100 px-3 py-1.5 rounded-xl w-fit">
           <Clock size={14} className="text-neutral-500" />
           Last synced: Just Now
         </div>
       </div>
 
       {/* Analytics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Card 1: Total Residents */}
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-emerald-500/20 hover:shadow-md transition-all duration-350 flex flex-col justify-between group">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-emerald-500/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
           <div className="flex items-start justify-between">
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
               <Users size={20} />
             </div>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0 rounded-full flex items-center gap-0">
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-full flex items-center gap-0.5">
               +2.4% <ArrowUpRight size={10} />
             </span>
           </div>
@@ -81,21 +131,21 @@ export default function Overview() {
             <span className="text-xs text-neutral-500 font-semibold tracking-wide block uppercase">Registered Residents</span>
             <span className="text-3xl font-extrabold text-charcoal mt-1 block">{totalResidents.toLocaleString()}</span>
           </div>
-          <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between text-xs text-neutral-500">
-            <span>98.6% profile completion</span>
+          <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between text-xs text-neutral-400 font-medium">
+            <span>98.6% profile verification rate</span>
           </div>
         </div>
 
         {/* Card 2: Active Complaints */}
         <div 
           onClick={() => navigate('/complaints')}
-          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-amber-500/20 hover:shadow-md transition-all duration-350 cursor-pointer flex flex-col justify-between group"
+          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-amber-500/20 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between group"
         >
           <div className="flex items-start justify-between">
             <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
               <FileText size={20} />
             </div>
-            <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0 rounded-full">
+            <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
               Live Tracker
             </span>
           </div>
@@ -104,12 +154,11 @@ export default function Overview() {
             <span className="text-3xl font-extrabold text-charcoal mt-1 block">{activeComplaints}</span>
           </div>
           
-          {/* Breakdown pill indicators */}
           <div className="border-t border-neutral-100 mt-4 pt-3 flex gap-2">
-            <span className="text-[10px] font-bold px-2 py-0 rounded-md bg-amber-100 text-amber-700">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700">
               {pendingCount} Pending
             </span>
-            <span className="text-[10px] font-bold px-2 py-0 rounded-md bg-blue-100 text-blue-700">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">
               {inProgressCount} In Progress
             </span>
           </div>
@@ -118,7 +167,7 @@ export default function Overview() {
         {/* Card 3: Emergency Broadcasts */}
         <div 
           onClick={() => navigate('/emergency-alert')}
-          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-red-500/20 hover:shadow-md transition-all duration-350 cursor-pointer flex flex-col justify-between group"
+          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-red-500/20 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between group"
         >
           <div className="flex items-start justify-between">
             <div className="relative">
@@ -130,11 +179,11 @@ export default function Overview() {
               )}
             </div>
             {activeAlertsCount > 0 ? (
-              <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0 rounded-full animate-pulse">
+              <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full animate-pulse">
                 Broadcast Live
               </span>
             ) : (
-              <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0 rounded-full">
+              <span className="text-[10px] font-bold text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
                 Inactive
               </span>
             )}
@@ -143,33 +192,90 @@ export default function Overview() {
             <span className="text-xs text-neutral-500 font-semibold tracking-wide block uppercase">Active Alerts</span>
             <span className="text-3xl font-extrabold text-charcoal mt-1 block">{activeAlertsCount}</span>
           </div>
-          <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between text-xs text-neutral-500">
-            <span>Published by Megaphone</span>
+          <div className="border-t border-neutral-100 mt-4 pt-3 text-xs text-neutral-400 font-medium truncate">
+            Latest: {alerts[0]?.title || 'No broadcasts'}
           </div>
         </div>
 
-        {/* Card 4: Upcoming Campaigns */}
+        {/* Card 4: Live Sanitation Status (Connected to Sanitation Manager) */}
         <div 
-          onClick={() => navigate('/campaign')}
-          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-emerald-500/20 hover:shadow-md transition-all duration-350 cursor-pointer flex flex-col justify-between group"
+          onClick={() => navigate('/sanitation')}
+          className="bg-white p-5 rounded-2xl border border-neutral-200/85 hover:border-emerald-500/20 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between group"
         >
           <div className="flex items-start justify-between">
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-primary flex items-center justify-center font-bold">
-              <Calendar size={20} />
+              <Truck size={20} />
             </div>
-            <span className="text-[10px] font-bold text-primary bg-primary-light px-2 py-0 rounded-full">
-              Planner
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${sanitationStatus.badgeColor}`}>
+              {sanitationStatus.badgeText}
             </span>
           </div>
           <div className="mt-4">
-            <span className="text-xs text-neutral-500 font-semibold tracking-wide block uppercase">Upcoming Campaigns</span>
-            <span className="text-3xl font-extrabold text-charcoal mt-1 block">{upcomingCampaignsCount}</span>
+            <span className="text-xs text-neutral-500 font-semibold tracking-wide block uppercase">Sanitation Run (Today)</span>
+            <span className="text-lg font-black text-charcoal mt-1 block truncate">
+              {sanitationStatus.statusText}
+            </span>
           </div>
-          <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between text-xs text-neutral-500">
-            <span>Next Drive: {campaigns[0]?.date ? campaigns[0].date : 'None'}</span>
+          <div className="border-t border-neutral-100 mt-4 pt-3 text-xs text-neutral-400 font-medium">
+            Manage dispatch timings & off days
           </div>
         </div>
 
+      </div>
+
+      {/* Quick Action Panel for Admins */}
+      <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm">
+        <h2 className="text-lg font-bold text-charcoal flex items-center gap-1.5 mb-1">
+          <ShieldAlert className="text-primary w-5 h-5" />
+          Quick Admin Actions
+        </h2>
+        <p className="text-neutral-500 text-xs mb-4">Launch tools or schedule adjustments directly into the system database.</p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button
+            onClick={() => navigate('/sanitation')}
+            className="flex items-center gap-3 p-4 border border-neutral-200 rounded-xl bg-neutral-50 hover:bg-emerald-550/10 hover:border-emerald-500/35 transition-all text-left text-sm font-bold text-neutral-800 cursor-pointer"
+          >
+            <Truck className="text-primary flex-shrink-0" size={18} />
+            <div>
+              <span>Reschedule Sanitation</span>
+              <span className="block text-[10px] text-neutral-400 font-semibold normal-case mt-0.5">Toggle week days & timings</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate('/emergency-alert')}
+            className="flex items-center gap-3 p-4 border border-neutral-200 rounded-xl bg-neutral-50 hover:bg-red-50/20 hover:border-red-500/30 transition-all text-left text-sm font-bold text-neutral-800 cursor-pointer"
+          >
+            <Megaphone className="text-red-500 flex-shrink-0" size={18} />
+            <div>
+              <span>Broadcast Emergency</span>
+              <span className="block text-[10px] text-neutral-400 font-semibold normal-case mt-0.5">Push critical notices to residents</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate('/campaign/new')}
+            className="flex items-center gap-3 p-4 border border-neutral-200 rounded-xl bg-neutral-50 hover:bg-blue-50/20 hover:border-blue-500/30 transition-all text-left text-sm font-bold text-neutral-800 cursor-pointer"
+          >
+            <Calendar className="text-blue-500 flex-shrink-0" size={18} />
+            <div>
+              <span>Plan Civic Drive</span>
+              <span className="block text-[10px] text-neutral-400 font-semibold normal-case mt-0.5">Host awareness & clean campaigns</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate('/staff')}
+            className="flex items-center gap-3 p-4 border border-neutral-200 rounded-xl bg-neutral-50 hover:bg-neutral-100 hover:border-neutral-400/40 transition-all text-left text-sm font-bold text-neutral-800 cursor-pointer"
+          >
+            <UserPlus className="text-neutral-600 flex-shrink-0" size={18} />
+            <div>
+              <span>Register Civic Staff</span>
+              <span className="block text-[10px] text-neutral-400 font-semibold normal-case mt-0.5">Manage dispatch engineers & helpers</span>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Two Column Layout: Detailed breakdown & Recent Activity */}
@@ -256,7 +362,7 @@ export default function Overview() {
           {/* Timeline Feed */}
           <div className="flex-1 space-y-4 overflow-y-auto pr-1">
             {activities.length > 0 ? (
-              activities.map((act, index) => (
+              activities.slice(0, 3).map((act, index) => (
                 <div key={`${act.id}-${index}`} className="flex gap-4 relative group">
                   {/* Vertical line connecting nodes */}
                   {index !== activities.length - 1 && (
@@ -298,7 +404,7 @@ export default function Overview() {
                     
                     {/* Badge */}
                     <div className="mt-2 flex items-center justify-between">
-                      <span className={`text-[9px] font-bold px-2 py-0 rounded-md ${act.badgeColor}`}>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${act.badgeColor}`}>
                         {act.status}
                       </span>
                       <span className="text-[10px] text-neutral-400 font-semibold">{act.id}</span>

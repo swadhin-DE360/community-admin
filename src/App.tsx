@@ -14,8 +14,13 @@ import GovtSchemeDetails from './pages/GovtSchemeDetails';
 import ImportantContacts from './pages/ImportantContacts';
 import Emergency from './pages/Emergency';
 import Staff from './pages/Staff';
+import Login from './pages/Login';
 
 const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <Login />
+  },
   {
     path: '/',
     element: <AdminLayout />,
@@ -29,7 +34,7 @@ const router = createBrowserRouter([
         element: <Overview />
       },
       {
-        path: 'sanitition',
+        path: 'sanitation',
         element: <Sanitition />
       },
       {

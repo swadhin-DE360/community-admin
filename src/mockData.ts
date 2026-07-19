@@ -49,6 +49,7 @@ export interface DirectoryContact {
   role: string;
   phone: string;
   email: string;
+  type?: string;
 }
 
 export const initialComplaints: Complaint[] = [
@@ -245,31 +246,35 @@ export const initialSchemes: CitizenScheme[] = [
 export const initialDirectory: DirectoryContact[] = [
   {
     id: "DIR-001",
-    name: "Smt. Arundhati Gowda",
-    role: "Ward Corporator / Counselor",
-    phone: "+91 98450 99887",
-    email: "arundhati.gowda@bbmp.gov.in"
+    name: "Ambulance Service",
+    role: "Emergency medical transport and trauma response team",
+    phone: "108",
+    email: "N/A",
+    type: "Emergency Helpline"
   },
   {
     id: "DIR-002",
-    name: "Er. Vignesh Prasad",
-    role: "Assistant Executive Engineer (AEE)",
-    phone: "+91 94488 22110",
-    email: "vignesh.prasad@bbmp.gov.in"
+    name: "Sanitation Helpline",
+    role: "Ward 18 garbage collection and sewage complaint desk",
+    phone: "+91 80222 55555",
+    email: "sanitation.help@bbmp.gov.in",
+    type: "Municipal Corporation"
   },
   {
     id: "DIR-003",
-    name: "Shri. Manjunath Swamy",
-    role: "Health Inspector (Ward 18)",
-    phone: "+91 98800 55441",
-    email: "manjunath.swamy@bbmp.gov.in"
+    name: "Electricity Helpline",
+    role: "Power outage and grid breakdown helpline",
+    phone: "1912",
+    email: "helpline@bescom.co.in",
+    type: "Emergency Helpline"
   },
   {
     id: "DIR-004",
-    name: "Smt. Sarah D'Souza",
-    role: "Chief Sanitary Superintendent",
-    phone: "+91 97411 33221",
-    email: "sarah.dsouza@bbmp.gov.in"
+    name: "Smt. Arundhati Gowda",
+    role: "Ward Corporator / Counselor Representative",
+    phone: "+91 98450 99887",
+    email: "arundhati.gowda@bbmp.gov.in",
+    type: "Ward Representative"
   }
 ];
 

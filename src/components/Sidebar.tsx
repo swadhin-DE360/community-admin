@@ -50,8 +50,8 @@ export default function Sidebar({
       badge: null
     },
     { 
-      path: '/sanitition', 
-      label: 'Sanitition', 
+      path: '/sanitation', 
+      label: 'Sanitation', 
       icon: Truck,
       badge: null
     },
@@ -240,7 +240,8 @@ export default function Sidebar({
                 <AlertDialogAction 
                   onClick={() => {
                     console.log('Logging out...');
-                    window.location.href = '/';
+                    localStorage.removeItem('ward18_admin_logged_in');
+                    window.location.href = '/login';
                   }}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
                 >

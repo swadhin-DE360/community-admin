@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { initialComplaints, initialAlerts } from '../mockData';
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const isLoggedIn = localStorage.getItem('ward18_admin_logged_in') === 'true';
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
 
   const pendingComplaintsCount = initialComplaints.filter(c => c.status === 'Pending').length;
   const activeAlertsCount = initialAlerts.filter(a => a.severity === 'Critical' || a.severity === 'Warning').length;
