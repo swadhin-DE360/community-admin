@@ -5,7 +5,8 @@ import {
   Search, 
   Trash2,
   Eye,
-  Pencil
+  Pencil,
+  Users
 } from 'lucide-react';
 import { initialCampaigns } from '../mockData';
 import type { Campaign } from '../mockData';
@@ -218,7 +219,7 @@ export default function Campaigns() {
               <TableHead className="p-4 w-[140px] text-xs font-semibold text-neutral-500 uppercase tracking-wider">Schedule</TableHead>
               <TableHead className="p-4 w-[180px] text-xs font-semibold text-neutral-500 uppercase tracking-wider">Venue</TableHead>
               <TableHead className="p-4 w-[160px] text-xs font-semibold text-neutral-500 uppercase tracking-wider">Organizer</TableHead>
-              <TableHead className="p-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">Description</TableHead>
+              <TableHead className="p-4 w-[150px] text-xs font-semibold text-neutral-500 uppercase tracking-wider">Interested Citizens</TableHead>
               <TableHead className="p-4 w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -259,9 +260,12 @@ export default function Campaigns() {
                     <TableCell className="p-4 text-neutral-600 max-w-[160px] truncate" title={c.organizer}>
                       {c.organizer}
                     </TableCell>
-                    {/* Description */}
-                    <TableCell className="p-4 text-neutral-400 italic font-medium max-w-[280px] truncate" title={c.description}>
-                      "{c.description}"
+                    {/* Interested Citizens */}
+                    <TableCell className="p-4 font-bold text-neutral-800">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-semibold text-xs">
+                        <Users size={13} className="text-emerald-600" />
+                        <span>{c.interestedCitizensCount ?? 0}</span>
+                      </div>
                     </TableCell>
                     {/* Actions */}
                     <TableCell className="p-4 text-right">

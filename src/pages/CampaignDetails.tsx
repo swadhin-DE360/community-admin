@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, MapPin, Clock, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, User, MapPin, Clock, Pencil, Trash2, Users } from 'lucide-react';
 import { initialCampaigns } from '../mockData';
 import type { Campaign } from '../mockData';
 import { Button } from '@/components/ui/button';
@@ -163,6 +163,17 @@ export default function CampaignDetails() {
               <div>
                 <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Organizer Details</span>
                 <span className="text-sm font-bold text-neutral-850">{campaign.organizer}</span>
+              </div>
+            </div>
+
+            {/* Interested Citizens */}
+            <div className="flex gap-3">
+              <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100 h-9 w-9 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                <Users size={16} />
+              </div>
+              <div>
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block mb-0">Interested Citizens</span>
+                <span className="text-sm font-bold text-emerald-700">{campaign.interestedCitizensCount ?? 0} Residents Interested</span>
               </div>
             </div>
           </div>

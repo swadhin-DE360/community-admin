@@ -92,6 +92,7 @@ export default function CampaignForm() {
     const list: Campaign[] = saved ? JSON.parse(saved) : initialCampaigns;
 
     if (isEdit) {
+      const existing = list.find(c => c.id === id);
       const updatedCampaign: Campaign = {
         id: id!,
         title: title.trim(),
@@ -101,6 +102,7 @@ export default function CampaignForm() {
         venue: venue.trim(),
         organizer: organizer.trim(),
         description: description.trim(),
+        interestedCitizensCount: existing?.interestedCitizensCount,
       };
       const updatedList = list.map(c => c.id === id ? updatedCampaign : c);
       localStorage.setItem('ward18_campaigns', JSON.stringify(updatedList));
@@ -114,6 +116,7 @@ export default function CampaignForm() {
         venue: venue.trim(),
         organizer: organizer.trim(),
         description: description.trim() || "No additional description provided.",
+        interestedCitizensCount: 0,
       };
       const updatedList = [newCampaign, ...list];
       localStorage.setItem('ward18_campaigns', JSON.stringify(updatedList));

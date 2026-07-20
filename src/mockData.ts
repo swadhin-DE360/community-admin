@@ -30,6 +30,7 @@ export interface Campaign {
   venue: string;
   organizer: string;
   description: string;
+  interestedCitizensCount?: number;
 }
 
 export interface CitizenScheme {
@@ -155,7 +156,8 @@ export const initialCampaigns: Campaign[] = [
     time: "07:30 AM - 11:00 AM",
     venue: "Starting from Ward Office to Main Market",
     organizer: "Ward 18 Youth Association & Citizen Forum",
-    description: "Volunteers gathering to collect single-use plastics and raise shopkeeper awareness. Cloth bags will be distributed free of cost."
+    description: "Volunteers gathering to collect single-use plastics and raise shopkeeper awareness. Cloth bags will be distributed free of cost.",
+    interestedCitizensCount: 142
   },
   {
     id: "CAMP-002",
@@ -165,7 +167,8 @@ export const initialCampaigns: Campaign[] = [
     time: "09:00 AM - 04:00 PM",
     venue: "Community Hall, Sector 2",
     organizer: "Ward 18 Health Department & Apollo Clinic",
-    description: "General body checkup, blood sugar, dengue testing, and flu shots. Pediatric consultation available. Free medicines for minor ailments."
+    description: "General body checkup, blood sugar, dengue testing, and flu shots. Pediatric consultation available. Free medicines for minor ailments.",
+    interestedCitizensCount: 98
   },
   {
     id: "CAMP-003",
@@ -175,7 +178,8 @@ export const initialCampaigns: Campaign[] = [
     time: "11:00 AM - 01:00 PM",
     venue: "Ward 18 Library Conference Hall",
     organizer: "Water Board Engineers Guild",
-    description: "Expert talk on simple retrofitting techniques for households to harvest rainwater. Guidance on getting govt subsidies for setups."
+    description: "Expert talk on simple retrofitting techniques for households to harvest rainwater. Guidance on getting govt subsidies for setups.",
+    interestedCitizensCount: 65
   }
 ];
 
