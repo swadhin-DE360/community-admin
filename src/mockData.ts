@@ -42,6 +42,8 @@ export interface CitizenScheme {
   requiredDocuments: string[];
   applyUrl: string;
   overview: string;
+  pdfUrl?: string;
+  pdfName?: string;
 }
 
 export interface DirectoryContact {
