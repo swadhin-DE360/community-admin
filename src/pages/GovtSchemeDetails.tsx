@@ -4,6 +4,7 @@ import { ArrowLeft, Edit, ExternalLink, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { initialSchemes } from '../mockData';
 import type { CitizenScheme } from '../mockData';
+import { getPdfFromIndexedDB } from '../db';
 
 export default function GovtSchemeDetails() {
   const navigate = useNavigate();
@@ -57,6 +58,14 @@ export default function GovtSchemeDetails() {
           eligibility: sEligibility,
           requiredDocuments: sRequiredDocs
         });
+
+        if (existing.pdfUrl) {
+          getPdfFromIndexedDB(existing.id).then(storedPdf => {
+            if (storedPdf) {
+              setScheme(prev => prev ? { ...prev, pdfUrl: storedPdf } : null);
+            }
+          });
+        }
       } else {
         navigate('/govt-schemes');
       }
@@ -197,6 +206,34 @@ export default function GovtSchemeDetails() {
             <ExternalLink size={12} className="opacity-80" />
           </a>
         </div>
+
+        {/* PDF Document Section */}
+        {scheme.pdfUrl && (
+          <div className="space-y-2 pt-4 border-t border-neutral-100 flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider block">Official Scheme Document</span>
+              <span className="text-xs text-neutral-600 font-bold break-all animate-fadeIn">
+                {scheme.pdfName || "Scheme_Document.pdf"}
+              </span>
+            </div>
+            <button 
+              onClick={() => {
+                if (!scheme.pdfUrl) return;
+                const link = document.createElement('a');
+                link.href = scheme.pdfUrl;
+                link.target = '_blank';
+                link.download = scheme.pdfName || 'Scheme_Document.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="inline-flex items-center gap-2 px-5 h-11 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-black rounded-xl transition-all shadow-md active:scale-95"
+            >
+              <span>View/Download Document</span>
+              <ExternalLink size={12} className="opacity-80" />
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

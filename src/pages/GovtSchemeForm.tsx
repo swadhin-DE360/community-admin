@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { initialSchemes } from '../mockData';
 import type { CitizenScheme } from '../mockData';
+import { savePdfToIndexedDB, getPdfFromIndexedDB, deletePdfFromIndexedDB } from '../db';
 
 const DEFAULT_CATEGORIES = ["Financial", "Housing", "Electricity"];
 
@@ -27,6 +28,8 @@ export default function GovtSchemeForm() {
   const [keyBenefitsList, setKeyBenefitsList] = useState<string[]>([]);
   const [requiredDocumentsList, setRequiredDocumentsList] = useState<string[]>([]);
   const [overview, setOverview] = useState('');
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [pdfName, setPdfName] = useState('');
 
   // Category select state
   const [existingCategories, setExistingCategories] = useState<string[]>([]);
@@ -59,6 +62,14 @@ export default function GovtSchemeForm() {
         
         const schemeCategory = existing.category || '';
         setCategorySelect(schemeCategory);
+        setPdfName(existing.pdfName || '');
+        if (existing.pdfUrl) {
+          getPdfFromIndexedDB(existing.id).then(storedPdf => {
+            if (storedPdf) {
+              setPdfUrl(storedPdf);
+            }
+          });
+        }
       } else {
         navigate('/govt-schemes');
       }
@@ -108,7 +119,28 @@ export default function GovtSchemeForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file only.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPdfUrl(reader.result as string);
+        setPdfName(file.name);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePdf = () => {
+    setPdfUrl('');
+    setPdfName('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Auto-commit any remaining text in inputs on submit
@@ -143,9 +175,19 @@ export default function GovtSchemeForm() {
 
     const formattedUrl = applyUrl.trim().startsWith('http') ? applyUrl.trim() : `https://${applyUrl.trim()}`;
 
+    const schemeId = isEdit ? id! : `SCHEME-${Date.now().toString().slice(-4)}`;
+
+    // Store PDF in IndexedDB if it exists (starts with data:application/pdf)
+    if (pdfUrl && pdfUrl.startsWith('data:')) {
+      await savePdfToIndexedDB(schemeId, pdfUrl);
+    } else if (!pdfUrl) {
+      // If pdf was removed, remove it from IndexedDB
+      await deletePdfFromIndexedDB(schemeId);
+    }
+
     if (isEdit) {
       const updatedScheme: CitizenScheme = {
-        id: id!,
+        id: schemeId,
         name: name.trim(),
         category: activeCategory,
         applyUrl: formattedUrl,
@@ -153,12 +195,14 @@ export default function GovtSchemeForm() {
         keyBenefits: cleanKeyBenefits,
         requiredDocuments: cleanRequiredDocuments,
         overview: overview.trim() || "No additional description provided.",
+        pdfUrl: pdfUrl ? 'indexeddb' : undefined,
+        pdfName: pdfName || undefined
       };
       const updatedList = list.map(s => s.id === id ? updatedScheme : s);
       localStorage.setItem('ward18_schemes', JSON.stringify(updatedList));
     } else {
       const newScheme: CitizenScheme = {
-        id: `SCHEME-${Date.now().toString().slice(-4)}`,
+        id: schemeId,
         name: name.trim(),
         category: activeCategory,
         applyUrl: formattedUrl,
@@ -166,6 +210,8 @@ export default function GovtSchemeForm() {
         keyBenefits: cleanKeyBenefits,
         requiredDocuments: cleanRequiredDocuments,
         overview: overview.trim() || "No additional description provided.",
+        pdfUrl: pdfUrl ? 'indexeddb' : undefined,
+        pdfName: pdfName || undefined
       };
       const updatedList = [newScheme, ...list];
       localStorage.setItem('ward18_schemes', JSON.stringify(updatedList));
@@ -456,6 +502,48 @@ export default function GovtSchemeForm() {
               rows={4}
               className="w-full p-3 text-xs bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-neutral-700 placeholder:text-neutral-400 font-semibold"
             />
+          </div>
+
+          {/* PDF Document Upload */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-neutral-600 block">Official Scheme Document (PDF)</label>
+            <div className="flex items-center gap-4">
+              {!pdfUrl ? (
+                <label 
+                  htmlFor="scheme-pdf-upload"
+                  className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 hover:border-emerald-500/50 bg-neutral-50/50 hover:bg-neutral-50 rounded-2xl cursor-pointer transition-all w-full max-w-xs text-neutral-400 hover:text-emerald-600"
+                >
+                  <Plus size={16} />
+                  <span className="text-xs font-bold uppercase tracking-wider">Upload Scheme PDF</span>
+                  <input 
+                    id="scheme-pdf-upload"
+                    type="file" 
+                    accept="application/pdf"
+                    onChange={handlePdfChange}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <div className="flex items-center justify-between gap-4 p-4 border border-neutral-200/80 rounded-2xl bg-neutral-50/30 w-full max-w-md">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-[10px]">
+                      PDF
+                    </div>
+                    <span className="text-xs font-semibold text-neutral-700 truncate max-w-[240px]">
+                      {pdfName}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemovePdf}
+                    className="p-1.5 rounded-lg border border-neutral-200 bg-white text-neutral-400 hover:text-neutral-600 hover:border-neutral-300 hover:shadow-xs active:scale-95 transition-all flex items-center justify-center"
+                    title="Remove file"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Form Actions */}
