@@ -14,7 +14,7 @@ import {
   ShieldAlert,
   UserPlus
 } from 'lucide-react';
-import { initialComplaints, initialAlerts, initialCampaigns } from '../mockData';
+import { initialComplaints, initialAlerts } from '../mockData';
 
 export default function Overview() {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ export default function Overview() {
   // Live states fetched from mockData and localStorage
   const complaints = initialComplaints;
   const alerts = initialAlerts;
-  const campaigns = initialCampaigns;
 
   const totalResidents = 14280;
   const activeComplaints = complaints.filter(c => c.status !== 'Resolved').length;
@@ -31,7 +30,6 @@ export default function Overview() {
   const resolvedCount = complaints.filter(c => c.status === 'Resolved').length;
   
   const activeAlertsCount = alerts.length;
-  const upcomingCampaignsCount = campaigns.length;
 
   // Retrieve Live Sanitation Status from localStorage
   const [sanitationStatus, setSanitationStatus] = useState({

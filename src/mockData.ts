@@ -55,6 +55,15 @@ export interface DirectoryContact {
   type?: string;
 }
 
+export interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  priority: number;
+  coverImage?: string;
+  datePublished: string;
+}
+
 export const initialComplaints: Complaint[] = [
   {
     id: "COMP-2026-001",
@@ -289,4 +298,39 @@ export const engineersList = [
   "Er. Amit Shah",
   "Er. Sandeep Patil",
   "Er. K. R. Rao"
+];
+
+export const initialAnnouncements: Announcement[] = [
+  {
+    id: 'ANN-2026-001',
+    title: 'Water Supply Pipeline Maintenance Schedule for Sector 4 & 5',
+    description: 'Due to planned valve replacement and pipe flushing operations, water supply will be suspended in Sector 4 and Sector 5 tomorrow from 10:00 AM to 4:00 PM. Please store adequate water.',
+    priority: 1,
+    coverImage: 'https://images.unsplash.com/photo-1542060748-10c28b629f6f?auto=format&fit=crop&q=80&w=800',
+    datePublished: '2026-07-23 09:30 AM'
+  },
+  {
+    id: 'ANN-2026-002',
+    title: 'Free Health & Vaccination Camp at Community Center',
+    description: 'A comprehensive free health screening and vaccination camp will be conducted this Saturday from 9:00 AM to 5:00 PM at Ward 18 Community Hall. Specialized doctors will be present.',
+    priority: 2,
+    coverImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800',
+    datePublished: '2026-07-22 02:15 PM'
+  },
+  {
+    id: 'ANN-2026-003',
+    title: 'Sanitation Truck Schedule Rescheduled for Festive Holiday',
+    description: 'Sanitation collection trucks will operate at 11:00 AM instead of the regular 8:00 AM dispatch timing due to holiday street cleaning setups.',
+    priority: 3,
+    coverImage: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=800',
+    datePublished: '2026-07-21 11:00 AM'
+  },
+  {
+    id: 'ANN-2026-004',
+    title: 'Urgent Monsoon Safety & Advisory Notice',
+    description: 'Heavy rainfall alert issued by IMD for the next 48 hours. Citizens are advised to avoid waterlogged underpasses and report electrical sparking or fallen trees immediately to ward helpline.',
+    priority: 4,
+    coverImage: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&q=80&w=800',
+    datePublished: '2026-07-20 08:00 AM'
+  }
 ];

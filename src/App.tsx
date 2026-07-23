@@ -14,6 +14,7 @@ import GovtSchemeDetails from './pages/GovtSchemeDetails';
 import ImportantContacts from './pages/ImportantContacts';
 import Emergency from './pages/Emergency';
 import Staff from './pages/Staff';
+import LatestAnnouncements from './pages/LatestAnnouncements';
 import Login from './pages/Login';
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: 'sanitation',
         element: <Sanitition />
+      },
+      {
+        path: 'latest-announcements',
+        element: <LatestAnnouncements />
       },
       {
         path: 'campaign',

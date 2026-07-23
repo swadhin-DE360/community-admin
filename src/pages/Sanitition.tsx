@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { 
-  Truck, 
-  Calendar, 
-  Clock, 
-  Trash2, 
-  AlertCircle, 
-  Plus, 
-  Info,
+import {
+  Truck,
+  Calendar,
+  Clock,
+  Trash2,
+  AlertCircle,
+  Plus,
   CalendarDays,
   Settings,
-  Edit
+  Edit,
+  Check
 } from 'lucide-react';
 
 // UI Components
@@ -51,10 +51,21 @@ interface ScheduleChange {
 
 export default function Sanitition() {
   // Load initial states from LocalStorage or use defaults
-  const [offDays, setOffDays] = useState<string[]>(() => {
+  const [savedOffDays, setSavedOffDays] = useState<string[]>(() => {
     const saved = localStorage.getItem('sanitation_off_days');
     return saved ? JSON.parse(saved) : ['Tuesday', 'Friday'];
   });
+
+  const [offDays, setOffDays] = useState<string[]>(() => savedOffDays);
+
+  const hasOffDaysChanged =
+    offDays.length !== savedOffDays.length ||
+    offDays.some(day => !savedOffDays.includes(day));
+
+  const handleSaveOffDays = () => {
+    setSavedOffDays(offDays);
+    localStorage.setItem('sanitation_off_days', JSON.stringify(offDays));
+  };
 
   const [scheduleChanges, setScheduleChanges] = useState<ScheduleChange[]>(() => {
     const saved = localStorage.getItem('sanitation_schedule_changes');
@@ -80,41 +91,19 @@ export default function Sanitition() {
   const [reason, setReason] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Sync to LocalStorage on state changes
-  useEffect(() => {
-    localStorage.setItem('sanitation_off_days', JSON.stringify(offDays));
-  }, [offDays]);
+
 
   useEffect(() => {
     localStorage.setItem('sanitation_schedule_changes', JSON.stringify(scheduleChanges));
   }, [scheduleChanges]);
 
-  // Helper helper to get current day's info
-  const getTodayDayName = () => {
-    return new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  };
-
   const getTodayDateString = () => {
     return new Date().toISOString().split('T')[0];
   };
 
-  const todayDayName = getTodayDayName();
   const todayDateString = getTodayDateString();
 
-  const getNextSevenDays = () => {
-    const list = [];
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
-      const dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      list.push({ dayName, dateLabel });
-    }
-    return list;
-  };
-
-  const nextSevenDays = getNextSevenDays();
+  const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   // Toggle off days
   const handleToggleOffDay = (day: string) => {
@@ -132,11 +121,11 @@ export default function Sanitition() {
       setErrorMessage('Please provide a reason for the timing change.');
       return;
     }
-    
+
     if (editingChange) {
       // Edit mode: Update the existing change
-      const updated = scheduleChanges.map(c => 
-        c.id === editingChange.id 
+      const updated = scheduleChanges.map(c =>
+        c.id === editingChange.id
           ? { ...c, date: targetDate, time: customTime, reason: reason.trim() }
           : c
       );
@@ -144,7 +133,7 @@ export default function Sanitition() {
     } else {
       // Create mode: Check if there is already a reschedule for this date
       const updated = scheduleChanges.filter(c => c.date !== targetDate);
-      
+
       const newChange: ScheduleChange = {
         id: Date.now().toString(),
         date: targetDate,
@@ -194,7 +183,7 @@ export default function Sanitition() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Title Header Widget */}
       <div className="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -226,40 +215,37 @@ export default function Sanitition() {
               Toggle specific days of the week to mark them as "Off Days". On these days, the truck does not run.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-neutral-400 bg-neutral-50 border border-neutral-200/60 px-3 py-1.5 rounded-xl font-semibold self-start sm:self-center">
-            <Info size={14} className="text-primary" />
-            Residents' app updates instantly
+          <div className="flex items-center gap-2.5 self-start sm:self-center">
+            {hasOffDaysChanged && (
+              <Button
+                onClick={handleSaveOffDays}
+                className="bg-primary hover:bg-primary/95 text-white text-xs font-bold px-3.5 py-1.5 h-auto rounded-xl shadow-sm transition-all flex items-center gap-1.5 animate-in fade-in duration-200"
+              >
+                <Check size={14} />
+                Save Changes
+              </Button>
+            )}
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          {nextSevenDays.map(({ dayName, dateLabel }, index) => {
+          {DAYS_OF_WEEK.map((dayName) => {
             const isOff = offDays.includes(dayName);
-            const isDayToday = index === 0;
-            
+
             return (
-              <div 
+              <div
                 key={dayName}
                 onClick={() => handleToggleOffDay(dayName)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between items-center text-center group h-32 relative ${
-                  isOff 
-                    ? 'border-red-200 bg-red-50/15 hover:bg-red-50/30 text-neutral-800' 
+                className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between items-center text-center group h-28 relative ${isOff
+                    ? 'border-red-200 bg-red-50/15 hover:bg-red-50/30 text-neutral-800'
                     : 'border-neutral-200 bg-white hover:border-emerald-500/25 hover:shadow-sm text-neutral-800'
-                }`}
+                  }`}
               >
-                {/* Date & Day Name */}
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                    {dateLabel}
-                  </span>
-                  <span className="font-extrabold text-sm text-charcoal mt-0.5">
+                {/* Day Name */}
+                <div className="flex flex-col items-center my-auto">
+                  <span className="font-extrabold text-sm text-charcoal">
                     {dayName}
                   </span>
-                  {isDayToday && (
-                    <span className="mt-1 text-[8px] font-black uppercase bg-neutral-800 text-white px-1.5 py-0.5 rounded leading-none">
-                      Today
-                    </span>
-                  )}
                 </div>
 
                 {/* Toggle Switch */}
@@ -272,19 +258,16 @@ export default function Sanitition() {
                       e.stopPropagation();
                       handleToggleOffDay(dayName);
                     }}
-                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      !isOff ? 'bg-primary' : 'bg-neutral-300'
-                    }`}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${!isOff ? 'bg-primary' : 'bg-neutral-300'
+                      }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                        !isOff ? 'translate-x-4' : 'translate-x-0'
-                      }`}
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${!isOff ? 'translate-x-4' : 'translate-x-0'
+                        }`}
                     />
                   </button>
-                  <span className={`text-[9px] font-black uppercase tracking-wide mt-1 ${
-                    !isOff ? 'text-primary' : 'text-red-500'
-                  }`}>
+                  <span className={`text-[9px] font-black uppercase tracking-wide mt-1 ${!isOff ? 'text-primary' : 'text-red-500'
+                    }`}>
                     {!isOff ? 'Active' : 'Off Day'}
                   </span>
                 </div>
@@ -306,7 +289,7 @@ export default function Sanitition() {
               Below are the specific days where the sanitation truck dispatch timing has been adjusted from the 8:00 AM default.
             </p>
           </div>
-          
+
           <Button
             onClick={handleAddClick}
             className="bg-primary hover:bg-primary/95 text-white text-xs font-bold p-4 rounded-xl shadow-sm transition-colors flex items-center gap-1.5 self-start sm:self-center"
@@ -337,7 +320,7 @@ export default function Sanitition() {
                     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
 
                     return (
-                      <TableRow 
+                      <TableRow
                         key={change.id}
                         className={isChangeToday ? 'bg-amber-50/20 hover:bg-amber-50/30 border-b border-neutral-100' : 'border-b border-neutral-100'}
                       >
@@ -390,7 +373,7 @@ export default function Sanitition() {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter className="mt-4 gap-2">
                                   <AlertDialogCancel className="text-xs font-semibold rounded-xl hover:bg-neutral-100 transition-colors">Cancel</AlertDialogCancel>
-                                  <AlertDialogAction 
+                                  <AlertDialogAction
                                     onClick={() => handleDeleteChange(change.id)}
                                     className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
                                   >
@@ -425,8 +408,8 @@ export default function Sanitition() {
               {editingChange ? 'Edit Schedule Override' : 'Reschedule Sanitation Dispatch'}
             </DialogTitle>
             <DialogDescription className="text-xs text-neutral-500 mt-1">
-              {editingChange 
-                ? 'Modify the timing override and reason details for this scheduled date.' 
+              {editingChange
+                ? 'Modify the timing override and reason details for this scheduled date.'
                 : 'Change the dispatch timing of the sanitation truck for a specific date. This pushes a notification to the resident app.'
               }
             </DialogDescription>
@@ -493,7 +476,7 @@ export default function Sanitition() {
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100 mt-2">
-              <DialogClose asChild>
+              <DialogClose>
                 <Button type="button" variant="outline" className="h-9 px-4 rounded-xl border border-neutral-200">
                   Cancel
                 </Button>

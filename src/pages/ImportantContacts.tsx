@@ -72,6 +72,7 @@ export default function ImportantContacts() {
               name: contactName.trim(), 
               role: contactRole.trim(), 
               phone: contactPhone.trim(), 
+              email: contactEmail.trim() || "N/A",
               type: contactType 
             }
           : d
@@ -83,7 +84,7 @@ export default function ImportantContacts() {
         name: contactName.trim(),
         role: contactRole.trim(),
         phone: contactPhone.trim(),
-        email: "N/A",
+        email: contactEmail.trim() || "N/A",
         type: contactType
       };
       setDirectory(prev => [newContact, ...prev]);
@@ -373,7 +374,7 @@ export default function ImportantContacts() {
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100 mt-2">
-              <DialogClose asChild>
+              <DialogClose>
                 <Button type="button" variant="outline" className="h-9 px-4 rounded-xl border border-neutral-200">
                   Cancel
                 </Button>

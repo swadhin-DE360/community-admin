@@ -21,7 +21,8 @@ import {
   Check,
   Plus,
   Pencil,
-  Trash2
+  Trash2,
+  Bell
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -148,6 +149,12 @@ export default function Sidebar({
       path: '/sanitation', 
       label: 'Sanitation', 
       icon: Truck,
+      badge: null
+    },
+    { 
+      path: '/latest-announcements', 
+      label: 'Latest Announcement', 
+      icon: Bell,
       badge: null
     },
     { 
