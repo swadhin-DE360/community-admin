@@ -1,40 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Megaphone, 
-  Calendar, 
-  ChevronLeft, 
-  ChevronRight, 
-  ShieldAlert, 
-  Menu, 
-  X,
-  Truck,
-  Users,
-  Building2,
-  Contact,
-  LogOut,
-  UserCog,
-  MapPin,
-  ChevronDown,
-  Check,
-  Plus,
-  Pencil,
-  Trash2,
-  Bell
-} from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchWards, createWardThunk, updateWardThunk, deleteWardThunk, setSelectedWardId, } from '@/store/wardSlice';
+import { LayoutDashboard, FileText, Megaphone, Calendar, ChevronLeft, ChevronRight, ShieldAlert, Menu, X, Truck, Users, Building2, Contact, LogOut, UserCog, MapPin, ChevronDown, Check, Plus, Pencil, Trash2, Bell } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from '@/components/ui/alert-dialog';
+import type { AppDispatch, RootState } from '@/store/store';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -43,31 +13,28 @@ interface SidebarProps {
   alertsCount: number;
 }
 
-export default function Sidebar({ 
-  isOpen, 
+export default function Sidebar({
+  isOpen,
   setIsOpen,
   complaintsCount,
   alertsCount
 }: SidebarProps) {
-  
-  // Dynamic Ward list and selection state for Admin
-  const [availableWards, setAvailableWards] = useState([
-    { id: 'ward-18', name: 'Ward 18', fullName: 'Ward 18 - Central Market' },
-    { id: 'ward-12', name: 'Ward 12', fullName: 'Ward 12 - North Civil Lines' },
-    { id: 'ward-05', name: 'Ward 05', fullName: 'Ward 05 - Green Park' },
-    { id: 'ward-24', name: 'Ward 24', fullName: 'Ward 24 - South Suburbs' },
-    { id: 'ward-09', name: 'Ward 09', fullName: 'Ward 09 - East Industrial' },
-  ]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { wards: availableWards, selectedWardId } = useSelector((state: RootState) => state.ward);
 
-  const [selectedWard, setSelectedWard] = useState<string>('ward-18');
+  useEffect(() => {
+    dispatch(fetchWards());
+  }, [dispatch]);
+
   const [isWardDropdownOpen, setIsWardDropdownOpen] = useState(false);
   const [isAddingWard, setIsAddingWard] = useState(false);
   const [newWardInput, setNewWardInput] = useState('');
 
   const selectWard = (wardId: string) => {
-    setSelectedWard(wardId);
+    dispatch(setSelectedWardId(wardId));
     setIsWardDropdownOpen(false);
     setIsAddingWard(false);
+    if (window.innerWidth < 1024) setIsOpen(false);
   };
 
   const handleAddWard = (e: React.FormEvent) => {
@@ -86,11 +53,7 @@ export default function Sidebar({
       fullName = trimmed;
     }
 
-    const newId = `ward-${Date.now()}`;
-    const newWardObj = { id: newId, name: shortName, fullName: fullName };
-    
-    setAvailableWards(prev => [...prev, newWardObj]);
-    setSelectedWard(newId);
+    dispatch(createWardThunk({ name: shortName, fullName }));
     setNewWardInput('');
     setIsAddingWard(false);
     setIsWardDropdownOpen(false);
@@ -100,9 +63,10 @@ export default function Sidebar({
   const [editingWardId, setEditingWardId] = useState<string | null>(null);
   const [editWardInput, setEditWardInput] = useState('');
 
-  const handleStartEdit = (ward: { id: string; fullName: string }, e: React.MouseEvent) => {
+  const handleStartEdit = (ward, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingWardId(ward.id);
+    const targetId = ward._id || ward.id || '';
+    setEditingWardId(targetId);
     setEditWardInput(ward.fullName);
   };
 
@@ -120,84 +84,78 @@ export default function Sidebar({
       shortName = parts[0].trim();
     }
 
-    setAvailableWards(prev => prev.map(w => w.id === wardId ? { ...w, name: shortName, fullName: trimmed } : w));
+    dispatch(updateWardThunk(wardId, { name: shortName, fullName: trimmed }));
     setEditingWardId(null);
   };
 
   const handleDeleteWard = (wardId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (availableWards.length <= 1) return;
-
-    const updated = availableWards.filter(w => w.id !== wardId);
-    setAvailableWards(updated);
-
-    if (selectedWard === wardId) {
-      setSelectedWard(updated[0].id);
-    }
+    dispatch(deleteWardThunk(wardId));
   };
 
-  const currentWard = availableWards.find(w => w.id === selectedWard) || availableWards[0];
+  const currentWard = availableWards.find(w => (w._id || w.id) === selectedWardId) || availableWards[0];
 
   const menuItems = [
-    { 
-      path: '/dashboard', 
-      label: 'Dashboard', 
+    {
+      path: '/dashboard',
+      label: 'Dashboard',
       icon: LayoutDashboard,
       badge: null
     },
-    { 
-      path: '/sanitation', 
-      label: 'Sanitation', 
+    {
+      path: '/sanitation',
+      label: 'Sanitation',
       icon: Truck,
       badge: null
     },
-    { 
-      path: '/latest-announcements', 
-      label: 'Latest Announcement', 
+    {
+      path: '/latest-announcements',
+      label: 'Latest Announcement',
       icon: Bell,
       badge: null
     },
-    { 
-      path: '/campaign', 
-      label: 'campaign', 
+    {
+      path: '/campaign',
+      label: 'campaign',
       icon: Calendar,
       badge: null
     },
-    { 
-      path: '/citizens', 
-      label: 'Citizens', 
+    {
+      path: '/citizens',
+      label: 'Citizens',
       icon: Users,
       badge: null
     },
-    { 
-      path: '/complaints', 
-      label: 'Complaints', 
+    {
+      path: '/complaints',
+      label: 'Complaints',
       icon: FileText,
       badge: complaintsCount > 0 ? complaintsCount : null,
       badgeColor: 'bg-amber-500 text-white'
     },
-    { 
-      path: '/govt-schemes', 
-      label: 'Govt Schemes', 
+    {
+      path: '/govt-schemes',
+      label: 'Govt Schemes',
       icon: Building2,
       badge: null
     },
-    { 
-      path: '/important-contacts', 
-      label: 'Imortant contacts', 
+    {
+      path: '/important-contacts',
+      label: 'Imortant contacts',
       icon: Contact,
       badge: null
     },
-    { 
-      path: '/emergency-alert', 
-      label: 'Emergency alert', 
+    {
+      path: '/emergency-alert',
+      label: 'Emergency alert',
       icon: Megaphone,
       badge: alertsCount > 0 ? alertsCount : null,
       badgeColor: 'bg-red-500 text-white'
     },
-    { 
-      path: '/staff', 
-      label: 'Staff Directory', 
+    {
+      path: '/staff',
+      label: 'Staff Directory',
       icon: UserCog,
       badge: null
     }
@@ -205,29 +163,29 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-40 p-2 rounded-lg bg-white shadow-md border border-neutral-200 text-neutral-800 lg:hidden hover:bg-neutral-50 transition-colors focus:outline-none"
-      >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      {/* Mobile Menu Toggle Button (when closed) */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed top-3 left-4 z-40 p-2 rounded-xl bg-white shadow-md border border-neutral-200 text-neutral-800 lg:hidden hover:bg-neutral-50 transition-colors focus:outline-none cursor-pointer"
+        >
+          <Menu size={20} />
+        </button>
+      )}
 
-      {/* Backdrop for Mobile */}
+      {/* Light Backdrop Overlay for Mobile */}
       {isOpen && (
-        <div 
+        <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-30 bg-neutral-900/30 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/10 lg:hidden"
         />
       )}
 
       {/* Sidebar Container */}
-      <aside 
-        className={`fixed top-0 bottom-0 left-0 z-35 flex flex-col bg-white text-neutral-800 border-r border-neutral-200 transition-all duration-300 ${
-          isOpen ? 'w-64' : 'w-20'
-        } ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+      <aside
+        className={`fixed top-0 bottom-0 left-0 z-40 flex flex-col bg-white text-neutral-800 border-r border-neutral-200 transition-all duration-300 ${isOpen ? 'w-64' : 'w-20'
+          } ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-100">
@@ -242,11 +200,19 @@ export default function Sidebar({
               </div>
             )}
           </div>
-          
+
+          {/* Close Button (Mobile only) */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg bg-neutral-100 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200/60 transition-colors cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+
           {/* Collapse Arrow Toggle (Desktop only) */}
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
-            className="hidden lg:flex p-1 rounded-lg bg-neutral-100 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200/60 transition-colors"
+            className="hidden lg:flex p-1 rounded-lg bg-neutral-100 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-200/60 transition-colors cursor-pointer"
           >
             {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
           </button>
@@ -283,7 +249,7 @@ export default function Sidebar({
               >
                 <div className="flex items-center gap-2 truncate">
                   <MapPin size={15} className="text-primary flex-shrink-0" />
-                  <span className="truncate">{currentWard.fullName}</span>
+                  <span className="truncate">{currentWard?.fullName || 'No Ward Available'}</span>
                 </div>
                 <ChevronDown size={14} className={`text-neutral-400 transition-transform duration-200 ${isWardDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -333,55 +299,57 @@ export default function Sidebar({
                       </div>
                     </form>
                   )}
-                  
+
                   <div className="max-h-48 overflow-y-auto space-y-1 pr-0.5">
                     {availableWards.map(ward => {
-                      const isSelected = ward.id === selectedWard;
-                      const isEditing = editingWardId === ward.id;
+                      const wardId = ward._id || ward.id || '';
+                      const isSelected = wardId === selectedWardId;
+                      const isEditing = editingWardId === wardId;
 
                       if (isEditing) {
                         return (
-                          <div key={ward.id} className="flex items-center gap-1.5 p-1 bg-neutral-100 rounded-lg" onClick={(e) => e.stopPropagation()}>
+                          <div key={wardId} className="flex items-center gap-1 p-1 bg-neutral-100 rounded-lg" onClick={(e) => e.stopPropagation()}>
                             <input
                               type="text"
                               value={editWardInput}
                               onChange={(e) => setEditWardInput(e.target.value)}
                               autoFocus
-                              className="flex-1 px-2 py-1 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-primary font-medium text-neutral-800"
+                              className="flex-1 min-w-0 px-2 py-1 text-xs bg-white border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-primary font-medium text-neutral-800"
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleSaveEdit(ward.id, e);
+                                if (e.key === 'Enter') handleSaveEdit(wardId, e);
                                 if (e.key === 'Escape') setEditingWardId(null);
                               }}
                             />
-                            <button
-                              type="button"
-                              onClick={(e) => handleSaveEdit(ward.id, e)}
-                              className="p-1 text-emerald-600 hover:bg-emerald-200/60 rounded cursor-pointer"
-                              title="Save Changes"
-                            >
-                              <Check size={13} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); setEditingWardId(null); }}
-                              className="p-1 text-neutral-400 hover:bg-neutral-200 rounded cursor-pointer"
-                              title="Cancel"
-                            >
-                              <X size={13} />
-                            </button>
+                            <div className="flex items-center gap-0.5 flex-shrink-0">
+                              <button
+                                type="button"
+                                onClick={(e) => handleSaveEdit(wardId, e)}
+                                className="p-1 text-emerald-600 hover:bg-emerald-200/60 rounded cursor-pointer flex items-center justify-center"
+                                title="Save Changes"
+                              >
+                                <Check size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setEditingWardId(null); }}
+                                className="p-1 text-neutral-400 hover:bg-neutral-200 rounded cursor-pointer flex items-center justify-center"
+                                title="Cancel"
+                              >
+                                <X size={13} />
+                              </button>
+                            </div>
                           </div>
                         );
                       }
 
                       return (
                         <div
-                          key={ward.id}
-                          onClick={() => selectWard(ward.id)}
-                          className={`group/item flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors select-none ${
-                            isSelected 
-                              ? 'bg-emerald-50 text-emerald-900 font-semibold' 
+                          key={wardId}
+                          onClick={() => selectWard(wardId)}
+                          className={`group/item flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors select-none ${isSelected
+                              ? 'bg-emerald-50 text-emerald-900 font-semibold'
                               : 'hover:bg-neutral-50 text-neutral-600'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-2 truncate flex-1 min-w-0 pr-1">
                             <span className="truncate">{ward.fullName}</span>
@@ -389,7 +357,7 @@ export default function Sidebar({
 
                           <div className="flex items-center gap-1">
                             {isSelected && <Check size={13} className="text-primary flex-shrink-0" />}
-                            
+
                             <div className="opacity-0 group-hover/item:opacity-100 flex items-center gap-0.5 transition-opacity">
                               <button
                                 type="button"
@@ -403,7 +371,7 @@ export default function Sidebar({
                               {availableWards.length > 1 && (
                                 <button
                                   type="button"
-                                  onClick={(e) => handleDeleteWard(ward.id, e)}
+                                  onClick={(e) => handleDeleteWard(wardId, e)}
                                   className="p-1 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer transition-colors"
                                   title="Delete Ward"
                                 >
@@ -431,7 +399,7 @@ export default function Sidebar({
               </button>
               {/* Tooltip */}
               <div className="absolute left-20 scale-0 group-hover:scale-100 transition-all origin-left duration-200 bg-neutral-900 border border-neutral-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none whitespace-nowrap z-50">
-                Ward: {currentWard.name}
+                Ward: {currentWard?.name || currentWard?.fullName || 'No Ward'}
               </div>
             </div>
           )}
@@ -448,11 +416,10 @@ export default function Sidebar({
                 onClick={() => {
                   if (window.innerWidth < 1024) setIsOpen(false); // Auto close mobile
                 }}
-                className={({ isActive }) => `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative ${
-                  isActive 
-                    ? 'bg-primary text-white shadow-md shadow-emerald-700/20' 
+                className={({ isActive }) => `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative ${isActive
+                    ? 'bg-primary text-white shadow-md shadow-emerald-700/20'
                     : 'text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100'
-                }`}
+                  }`}
               >
                 {({ isActive }) => (
                   <>
@@ -460,14 +427,13 @@ export default function Sidebar({
                     {isActive && (
                       <div className="absolute left-0 top-3 bottom-3 w-1 rounded-r-md bg-white" />
                     )}
-                    
-                    <Icon 
-                      size={19} 
-                      className={`flex-shrink-0 transition-transform group-hover:scale-105 ${
-                        isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-600'
-                      }`} 
+
+                    <Icon
+                      size={19}
+                      className={`flex-shrink-0 transition-transform group-hover:scale-105 ${isActive ? 'text-white' : 'text-neutral-400 group-hover:text-neutral-600'
+                        }`}
                     />
-                    
+
                     {isOpen && (
                       <span className="truncate flex-1 text-left">{item.label}</span>
                     )}
@@ -498,14 +464,14 @@ export default function Sidebar({
                 <button
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium group text-sm relative text-red-600 hover:text-red-700 hover:bg-red-50 focus:outline-none cursor-pointer"
                 >
-                  <LogOut 
-                    size={19} 
-                    className="flex-shrink-0 text-red-500 group-hover:text-red-600 transition-transform group-hover:scale-105" 
+                  <LogOut
+                    size={19}
+                    className="flex-shrink-0 text-red-500 group-hover:text-red-600 transition-transform group-hover:scale-105"
                   />
                   {isOpen && (
                     <span className="truncate flex-1 text-left font-semibold">Logout</span>
                   )}
-                  
+
                   {/* Collapsed Hover Tooltip (Desktop only) */}
                   {!isOpen && (
                     <div className="absolute left-20 scale-0 group-hover:scale-100 transition-all origin-left duration-200 bg-neutral-900 border border-neutral-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl pointer-events-none whitespace-nowrap z-50">
@@ -524,7 +490,7 @@ export default function Sidebar({
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-4 gap-2">
                 <AlertDialogCancel className="text-xs font-semibold rounded-xl hover:bg-neutral-100 transition-colors">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
+                <AlertDialogAction
                   onClick={() => {
                     console.log('Logging out...');
                     localStorage.removeItem('ward18_admin_logged_in');

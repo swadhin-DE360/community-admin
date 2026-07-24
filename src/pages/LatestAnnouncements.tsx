@@ -429,10 +429,8 @@ export default function LatestAnnouncements() {
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100 mt-2">
-              <DialogClose>
-                <Button type="button" variant="outline" className="h-9 px-4 rounded-xl border border-neutral-200">
-                  Cancel
-                </Button>
+              <DialogClose className="h-9 px-4 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold inline-flex items-center justify-center transition-colors cursor-pointer">
+                Cancel
               </DialogClose>
               <Button
                 type="submit"

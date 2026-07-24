@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/AdminLayout';
 import Overview from './pages/Overview';
 import Sanitition from './pages/Sanitition';
@@ -16,96 +16,56 @@ import Emergency from './pages/Emergency';
 import Staff from './pages/Staff';
 import LatestAnnouncements from './pages/LatestAnnouncements';
 import Login from './pages/Login';
-
-const router = createBrowserRouter([
-  {
-    path: '/login',
-    element: <Login />
-  },
-  {
-    path: '/',
-    element: <AdminLayout />,
-    children: [
-      {
-        index: true,
-        element: <Navigate to="/dashboard" replace />
-      },
-      {
-        path: 'dashboard',
-        element: <Overview />
-      },
-      {
-        path: 'sanitation',
-        element: <Sanitition />
-      },
-      {
-        path: 'latest-announcements',
-        element: <LatestAnnouncements />
-      },
-      {
-        path: 'campaign',
-        element: <Campaigns />
-      },
-      {
-        path: 'campaign/new',
-        element: <CampaignForm />
-      },
-      {
-        path: 'campaign/edit/:id',
-        element: <CampaignForm />
-      },
-      {
-        path: 'campaign/details/:id',
-        element: <CampaignDetails />
-      },
-      {
-        path: 'citizens',
-        element: <Citizens />
-      },
-      {
-        path: 'staff',
-        element: <Staff />
-      },
-      {
-        path: 'complaints',
-        element: <Complaints />
-      },
-      {
-        path: 'complaints/:id',
-        element: <ComplaintDetails />
-      },
-      {
-        path: 'govt-schemes',
-        element: <GovtSchemes />
-      },
-      {
-        path: 'govt-schemes/new',
-        element: <GovtSchemeForm />
-      },
-      {
-        path: 'govt-schemes/edit/:id',
-        element: <GovtSchemeForm />
-      },
-      {
-        path: 'govt-schemes/:id',
-        element: <GovtSchemeDetails />
-      },
-      {
-        path: 'important-contacts',
-        element: <ImportantContacts />
-      },
-      {
-        path: 'emergency-alert',
-        element: <Emergency />
-      },
-      {
-        path: '*',
-        element: <Navigate to="/dashboard" replace />
-      }
-    ]
-  }
-]);
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProfile } from './store/authSlice';
+import { fetchImportantContacts } from './store/importantContactsSlice';
+import { fetchEmergencyAlerts } from './store/emergencyAlertSlice';
+import { fetchSanitationSchedule } from './store/sanitationSlice';
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const { selectedWardId } = useSelector((state: any) => state.ward);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchProfile() as any);
+    }
+  }, [dispatch, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchImportantContacts(selectedWardId) as any);
+      dispatch(fetchEmergencyAlerts(selectedWardId) as any);
+      dispatch(fetchSanitationSchedule(selectedWardId) as any);
+    }
+  }, [dispatch, isAuthenticated, selectedWardId]);
+
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<AdminLayout />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<Overview />} />
+        <Route path="sanitation" element={<Sanitition />} />
+        <Route path="latest-announcements" element={<LatestAnnouncements />} />
+        <Route path="campaign" element={<Campaigns />} />
+        <Route path="campaign/new" element={<CampaignForm />} />
+        <Route path="campaign/edit/:id" element={<CampaignForm />} />
+        <Route path="campaign/details/:id" element={<CampaignDetails />} />
+        <Route path="citizens" element={<Citizens />} />
+        <Route path="staff" element={<Staff />} />
+        <Route path="complaints" element={<Complaints />} />
+        <Route path="complaints/:id" element={<ComplaintDetails />} />
+        <Route path="govt-schemes" element={<GovtSchemes />} />
+        <Route path="govt-schemes/new" element={<GovtSchemeForm />} />
+        <Route path="govt-schemes/edit/:id" element={<GovtSchemeForm />} />
+        <Route path="govt-schemes/:id" element={<GovtSchemeDetails />} />
+        <Route path="important-contacts" element={<ImportantContacts />} />
+        <Route path="emergency-alert" element={<Emergency />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Route>
+    </Routes>
+  );
 }

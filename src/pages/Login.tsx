@@ -2,24 +2,20 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '@/store/authSlice';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@ward18.in');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state: any) => state.auth);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Mock network request delay for realistic interaction
-    setTimeout(() => {
-      localStorage.setItem('ward18_admin_logged_in', 'true');
-      setIsLoading(false);
-      navigate('/dashboard');
-    }, 600);
+    dispatch(loginUser({ email, password, navigate }) as any);
   };
 
   return (
@@ -41,7 +37,7 @@ export default function Login() {
         </p>
 
         {/* Login Form */}
-        <form onSubmit={handleLogin} className="w-full space-y-5">
+        <form onSubmit={handleLogin} autoComplete="off" className="w-full space-y-5">
           <div>
             <label className="block text-xs font-bold text-neutral-500 uppercase tracking-wide mb-1.5">
               Admin Email
@@ -55,6 +51,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@ward18.in"
+                autoComplete="off"
                 className="w-full bg-white border border-neutral-250 rounded-xl pl-10 pr-4 py-2.5 text-sm font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 required
               />
@@ -74,6 +71,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                autoComplete="new-password"
                 className="w-full bg-white border border-neutral-250 rounded-xl pl-10 pr-10 py-2.5 text-sm font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 required
               />
@@ -102,10 +100,10 @@ export default function Login() {
           {/* Action Button */}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold h-11 rounded-xl shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            {isLoading ? (
+            {loading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                 Verifying Credentials...
