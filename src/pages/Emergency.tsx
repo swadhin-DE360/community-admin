@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
   Megaphone,
   Search,
@@ -7,10 +8,14 @@ import {
   Clock,
   X,
   Edit,
-  
 } from 'lucide-react';
-import { initialAlerts } from '../mockData';
-import type { MegaphoneAlert } from '../mockData';
+import type { AppDispatch, RootState } from '@/store/store';
+import {
+  createEmergencyAlert,
+  updateEmergencyAlert,
+  deleteEmergencyAlert,
+  type EmergencyAlertItem,
+} from '@/store/emergencyAlertSlice';
 
 // UI Components
 import { Input } from '@/components/ui/input';
@@ -56,11 +61,12 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
 export default function Emergency() {
-  const [alerts, setAlerts] = useState<MegaphoneAlert[]>(() => {
-    const saved = localStorage.getItem('ward18_alerts');
-    return saved ? JSON.parse(saved) : initialAlerts;
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const { alerts, loading } = useSelector((state: RootState) => state.emergencyAlert);
+  const { selectedWardId } = useSelector((state: RootState) => state.ward);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,52 +74,40 @@ export default function Emergency() {
 
   // Dialog State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingAlert, setEditingAlert] = useState<MegaphoneAlert | null>(null);
+  const [editingAlert, setEditingAlert] = useState<EmergencyAlertItem | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [severity, setSeverity] = useState<MegaphoneAlert['severity']>('Info');
+  const [severity, setSeverity] = useState<EmergencyAlertItem['severity']>('Info');
 
-  const saveToStorage = (list: MegaphoneAlert[]) => {
-    setAlerts(list);
-    localStorage.setItem('ward18_alerts', JSON.stringify(list));
-  };
-
-  const handleCreateAlert = (e: React.FormEvent) => {
+  const handleCreateAlert = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !message.trim()) return;
 
-    if (editingAlert) {
-      // Update Alert
-      const updated = alerts.map(a => 
-        a.id === editingAlert.id 
-          ? { ...a, title: title.trim(), message: message.trim(), severity } 
-          : a
-      );
-      saveToStorage(updated);
+    // Formatting date as "YYYY-MM-DD hh:mm AM/PM"
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const datePublished = `${dateStr} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+
+    const payload = {
+      title: title.trim(),
+      message: message.trim(),
+      severity,
+      datePublished,
+      wardId: selectedWardId || undefined,
+    };
+
+    if (editingAlert && (editingAlert._id || editingAlert.id)) {
+      const targetId = (editingAlert._id || editingAlert.id) as string;
+      await dispatch(updateEmergencyAlert({ id: targetId, data: payload }));
     } else {
-      // Create Alert
-      // Formatting date as "YYYY-MM-DD hh:mm AM/PM"
-      const now = new Date();
-      const dateStr = now.toISOString().split('T')[0];
-      let hours = now.getHours();
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; // the hour '0' should be '12'
-      const datePublished = `${dateStr} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
-
-      const newAlert: MegaphoneAlert = {
-        id: `ALERT-${Date.now().toString().slice(-4)}`,
-        title: title.trim(),
-        message: message.trim(),
-        severity,
-        datePublished
-      };
-
-      const updated = [newAlert, ...alerts];
-      saveToStorage(updated);
+      await dispatch(createEmergencyAlert(payload));
       setCurrentPage(1);
     }
 
@@ -125,12 +119,8 @@ export default function Emergency() {
     setIsCreateOpen(false);
   };
 
-  const handleDeleteAlert = (id: string) => {
-    const updated = alerts.filter(a => a.id !== id);
-    saveToStorage(updated);
-    if (currentPage > Math.ceil(updated.length / itemsPerPage)) {
-      setCurrentPage(Math.max(1, currentPage - 1));
-    }
+  const handleDeleteAlert = async (id: string) => {
+    await dispatch(deleteEmergencyAlert(id));
   };
 
   const filteredAlerts = alerts.filter(a => 
@@ -145,7 +135,7 @@ export default function Emergency() {
   const startIndex = (activePage - 1) * itemsPerPage;
   const paginatedAlerts = filteredAlerts.slice(startIndex, startIndex + itemsPerPage);
 
-  const getSeverityStyles = (sev: MegaphoneAlert['severity']) => {
+  const getSeverityStyles = (sev: EmergencyAlertItem['severity']) => {
     switch (sev) {
       case 'Critical':
         return 'bg-red-50 text-red-700 border-red-200/50';
@@ -215,7 +205,31 @@ export default function Emergency() {
             </TableRow>
           </TableHeader>
           <TableBody className="divide-y divide-neutral-100 text-xs font-medium text-neutral-700">
-            {paginatedAlerts.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i} className="border-b border-neutral-100">
+                  <TableCell className="p-4">
+                    <div className="space-y-1">
+                      <Skeleton className="h-3.5 w-20" />
+                      <Skeleton className="h-3 w-14" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="p-4">
+                    <Skeleton className="h-5 w-16 rounded-lg" />
+                  </TableCell>
+                  <TableCell className="p-4 space-y-1.5">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3.5 w-72" />
+                  </TableCell>
+                  <TableCell className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Skeleton className="w-6 h-6 rounded-lg" />
+                      <Skeleton className="w-6 h-6 rounded-lg" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : paginatedAlerts.length > 0 ? (
               paginatedAlerts.map((alert) => (
                 <TableRow 
                   key={alert.id}
@@ -288,7 +302,7 @@ export default function Emergency() {
                           <AlertDialogFooter className="mt-4 gap-2">
                             <AlertDialogCancel className="text-xs font-semibold rounded-xl hover:bg-neutral-100 transition-colors">Cancel</AlertDialogCancel>
                             <AlertDialogAction 
-                              onClick={() => handleDeleteAlert(alert.id)}
+                              onClick={() => handleDeleteAlert((alert._id || alert.id) as string)}
                               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-extrabold shadow-sm transition-all"
                             >
                               Delete Alert
@@ -388,7 +402,7 @@ export default function Emergency() {
             {/* Severity */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Severity Level</label>
-              <Select value={severity} onValueChange={(val) => setSeverity(val as MegaphoneAlert['severity'])}>
+              <Select value={severity} onValueChange={(val) => setSeverity(val as EmergencyAlertItem['severity'])}>
                 <SelectTrigger className="w-full h-9 text-xs font-semibold text-neutral-700 rounded-xl">
                   <SelectValue placeholder="Select Severity" />
                 </SelectTrigger>
